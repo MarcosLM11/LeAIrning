@@ -9,6 +9,17 @@ services:
       - '5432:5432'
     volumes:
       - 'users_service_db_data:/var/lib/postgresql/data'
+  postgres_documents_service_db:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=documents_service_db'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
+    ports:
+      - '5433:5432'
+    volumes:
+      - 'documents_service_db_data:/var/lib/postgresql/data'
 
 volumes:
   users_service_db_data:
+  documents_service_db_data:
