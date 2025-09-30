@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application: #Nombre de la aplicación
+    name: users-service
+  datasource: #Configuración de la fuente de datos (PostgreSQL)
+    url: jdbc:postgresql://localhost:5432/users_service_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa: #Configuración JPA/Hibernate
+    hibernate:
+      ddl-auto: update #update para desarrollo, validate para producción
+    show-sql: false
+    properties:
+        hibernate:
+            dialect: org.hibernate.dialect.PostgreSQLDialect
+    defer-datasource-initialization: true # Init db after JPA is ready
+
+
+management: # Actuator endpoints config
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env: # Include environment info in /actuator/info endpoint
+      enabled: true
+    build: # Include build info in /actuator/info endpoint
+      enabled: true
+    git: # Include git info in /actuator/info endpoint
+      enabled: true
+
+logging: # Configuración de logging
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/users-service.log
+
+info:
+  app:
+    name: ${spring.application.name}
+    description: "Users Service for LeAIrning App"
+    version: ${APP_VERSION:1.0.0}
+    author: "Marcos López Marín"
