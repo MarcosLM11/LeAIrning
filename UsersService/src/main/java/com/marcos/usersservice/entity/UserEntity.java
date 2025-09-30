@@ -2,15 +2,18 @@ package com.marcos.usersservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.UUID;
 
-@Entity(name = "user")
-@Table(name = "users")
+@Entity
+@Table(name = "users", indexes = {
+        @Index(name = "idx_users_username", columnList = "username", unique = true),
+        @Index(name = "idx_users_email", columnList = "email", unique = true),
+})
 @Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class UserEntity extends AuditEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -20,11 +23,4 @@ public class UserEntity {
     private String firstName;
     private String lastName;
     private String phoneNumber;
-
-
-    //audit
-    private LocalDateTime createdAt;
-    private String createdBy;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
 }

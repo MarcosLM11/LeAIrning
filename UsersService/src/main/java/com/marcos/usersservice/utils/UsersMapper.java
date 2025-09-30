@@ -21,8 +21,6 @@ public interface UsersMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(UpdateUserRequestDto dto, @MappingTarget UserEntity entity);
 
-    @Mapping(target = "roles", ignore = true)
     UserResponseDto toDto(UserEntity entity);
-
     List<UserResponseDto> toDtoList(List<UserEntity> entities);
 }

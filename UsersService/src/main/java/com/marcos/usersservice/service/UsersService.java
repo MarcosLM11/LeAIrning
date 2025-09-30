@@ -16,6 +16,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class UsersService {
 
     private final UsersRepository usersRepository;
@@ -26,53 +27,56 @@ public class UsersService {
         this.usersMapper = usersMapper;
     }
 
-    @Transactional(readOnly = true)
     public List<UserResponseDto> findAll() {
-        log.debug(" Fetching all users");
-        List<UserEntity> users = usersRepository.findAll();
-        return usersMapper.toDtoList(users);
+        log.debug("Fetching all users");
+        return usersRepository.findAll()
+                .stream()
+                .map(usersMapper::toDto)
+                .toList();
     }
 
     public Page<UserResponseDto> findAll(Pageable pageable) {
-        log.debug(" Fetching users with pagination: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<UserEntity> usersPage = usersRepository.findAll(pageable);
-        return usersPage.map(usersMapper::toDto);
+        log.debug("Fetching users with pagination: page {}, size {}", pageable.getPageNumber(), pageable.getPageSize());
+        return usersRepository.findAll(pageable)
+                .map(usersMapper::toDto);
     }
 
-    @Transactional(readOnly = true)
     public UserResponseDto getUserById(UUID userId) {
-        log.debug(" Fetching user with ID: {}", userId);
-        UserEntity userEntity = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-        return usersMapper.toDto(userEntity);
+        log.debug("Fetching user with ID: {}", userId);
+        return usersRepository.findById(userId)
+                .map(usersMapper::toDto)
+                .orElseThrow(() -> new RuntimeException(""+userId));
     }
 
     @Transactional
     public UserResponseDto createUser(CreateUserRequestDto request) {
-        log.debug(" Creating user with email: {}", request.email());
+        log.debug("Creating user with email: {}", request.email());
         UserEntity userEntity = usersMapper.toEntity(request);
         userEntity.setPassword(request.password());
         UserEntity savedUser = usersRepository.save(userEntity);
+        log.info("User created with ID: {}", savedUser.getId());
         return usersMapper.toDto(savedUser);
     }
 
     @Transactional
     public UserResponseDto updateUser(UUID userId, UpdateUserRequestDto request) {
-        log.debug(" Updating user with ID: {}", userId);
+        log.debug("Updating user with ID: {}", userId);
         UserEntity existingUser = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+                .orElseThrow(() -> new RuntimeException(""+userId));
         usersMapper.updateEntityFromDto(request, existingUser);
         UserEntity updatedUser = usersRepository.save(existingUser);
+        log.info("User updated with ID: {}", updatedUser.getId());
         return usersMapper.toDto(updatedUser);
     }
 
     @Transactional
     public void deleteUser(UUID userId) {
-        log.debug(" Deleting user with ID: {}", userId);
+        log.debug("Deleting user with ID: {}", userId);
         if (!usersRepository.existsById(userId)) {
             throw new RuntimeException("User not found with ID: " + userId);
         }
         usersRepository.deleteById(userId);
+        log.info("User deleted with ID: {}", userId);
     }
 
 

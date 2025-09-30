@@ -37,11 +37,14 @@ management: # Actuator endpoints config
       enabled: true
 
 logging: # Configuración de logging
+  level:
+    root: ERROR
+    com.marcos.usersservice: DEBUG
   pattern:
-    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${PID:- }){magenta} %clr([%15.15t]){faint} %clr(%-5level){highlight} %clr([%30.30logger{29}]){cyan} %clr(:){faint} %m%n%ex{short}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} ${PID:- } [%thread] %-5level %logger{36} - %msg%n%ex{full}"
   file:
-    name: logs/users-service.log
+    name: logs/${spring.application.name}.log
 
 info:
   app:
