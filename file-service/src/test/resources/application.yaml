@@ -2,7 +2,6 @@ spring:
   application:
     name: file-service
 
-# No collector in tests: do not try to export telemetry.
 management:
   otlp:
     metrics:
@@ -15,7 +14,6 @@ management:
       export:
         enabled: false
 
-# This file hides src/main/resources/application.yaml in tests, so s3 is repeated here.
 s3:
   endpoint: http://localhost:9000
   region: us-east-1
