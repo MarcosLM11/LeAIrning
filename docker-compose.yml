@@ -23,6 +23,16 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql
 
+  grafana:
+    image: grafana/otel-lgtm:0.39.0
+    ports:
+      - "3000:3000"   # Grafana UI (admin / admin)
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    volumes:
+      - grafana-data:/data
+
 volumes:
   s3-data:
   pg-data:
+  grafana-data:
