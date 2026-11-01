@@ -1,7 +1,20 @@
 spring:
   application:
     name: file-service
+  threads:
+    virtual:
+      enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+
+s3:
+  endpoint: http://localhost:9000
+  region: us-east-1
+  access-key: rustfsadmin
+  secret-key: rustfsadmin
+  bucket: files

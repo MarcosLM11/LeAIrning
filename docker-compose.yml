@@ -1,0 +1,28 @@
+services:
+  s3:
+    image: rustfs/rustfs:1.0.4
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ACCESS_KEY: rustfsadmin
+      RUSTFS_SECRET_KEY: rustfsadmin
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - s3-data:/data
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: fileservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql
+
+volumes:
+  s3-data:
+  pg-data:

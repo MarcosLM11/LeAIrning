@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: file-service
+
+# No collector in tests: do not try to export telemetry.
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false
+
+# This file hides src/main/resources/application.yaml in tests, so s3 is repeated here.
+s3:
+  endpoint: http://localhost:9000
+  region: us-east-1
+  access-key: rustfsadmin
+  secret-key: rustfsadmin
+  bucket: files
