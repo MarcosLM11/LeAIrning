@@ -1,6 +1,9 @@
 spring:
   application:
     name: file-service
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
 
 management:
   otlp:

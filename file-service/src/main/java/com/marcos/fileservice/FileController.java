@@ -1,6 +1,7 @@
 package com.marcos.fileservice;
 
 import java.io.IOException;
+import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,13 +26,13 @@ class FileController {
     }
 
     @PostMapping
-    ResponseEntity<String> upload(HttpServletRequest request) throws IOException {
-        var key = service.upload(request);
+    ResponseEntity<String> upload(HttpServletRequest request, @RequestParam(required = false) String name) {
+        var key = service.upload(request, name);
         return ResponseEntity.ok("uploaded file: " + key);
     }
 
     @GetMapping("/{key}")
-    ResponseEntity<Resource> download(@PathVariable String key) {
+    ResponseEntity<Resource> download(@PathVariable UUID key) {
         service.assertExists(key);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -38,7 +40,7 @@ class FileController {
     }
 
     @DeleteMapping("/{key}")
-    ResponseEntity<Void> delete(@PathVariable String key) {
+    ResponseEntity<Void> delete(@PathVariable UUID key) {
         service.delete(key);
         return ResponseEntity.noContent().build();
     }

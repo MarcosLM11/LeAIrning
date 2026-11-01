@@ -11,6 +11,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+  jpa:
+    open-in-view: false
+    hibernate:
+      # shortcut: auto schema updates, switch to Flyway/Liquibase before production data matters.
+      ddl-auto: update
 
 s3:
   endpoint: http://localhost:9000

@@ -12,36 +12,51 @@ import org.springframework.stereotype.Service;
 class FileService {
 
     private final S3Service s3;
+    private final FileMetadataRepository repository;
 
-    FileService(S3Service s3) {
+    FileService(S3Service s3, FileMetadataRepository repository) {
         this.s3 = s3;
+        this.repository = repository;
     }
 
-    String upload(HttpServletRequest request) {
+    UUID upload(HttpServletRequest request, String name) {
         //validate length > 0, virus scan, tipo válido
-        var key = UUID.randomUUID().toString();
         var length = request.getContentLengthLong();
         var contentType = request.getContentType() != null
                 ? request.getContentType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        var file = repository.save(new FileMetadata(name != null ? name : "unnamed", contentType, length));
+        var key = file.getId();
 
         try {
-            s3.upload(key, request.getInputStream(), length, contentType);
+            s3.upload(key.toString(), request.getInputStream(), length, contentType);
         } catch (IOException e) {
+            markFailed(file);
             throw new RuntimeException(e);
+        } catch (RuntimeException e) {
+            markFailed(file);
+            throw e;
         }
+        file.setStatus(FileStatus.UPLOADED);
+        repository.save(file);
         return key;
     }
 
-    void assertExists(String key) {
-        s3.assertExists(key);
+    private void markFailed(FileMetadata file) {
+        file.setStatus(FileStatus.FAILED);
+        repository.save(file);
     }
 
-    InputStream download(String key) {
-        return s3.download(key);
+    void assertExists(UUID key) {
+        s3.assertExists(key.toString());
     }
 
-    void delete(String key) {
-        s3.delete(key);
+    InputStream download(UUID key) {
+        return s3.download(key.toString());
+    }
+
+    void delete(UUID key) {
+        s3.delete(key.toString());
+        repository.deleteById(key);
     }
 }
