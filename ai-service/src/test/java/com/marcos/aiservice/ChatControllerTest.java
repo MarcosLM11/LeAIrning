@@ -1,5 +1,7 @@
 package com.marcos.aiservice;
 
+import com.marcos.aiservice.chat.ChatController;
+import com.marcos.aiservice.chat.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;

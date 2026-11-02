@@ -1,4 +1,4 @@
-package com.marcos.aiservice;
+package com.marcos.aiservice.chat;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.session.SessionService;

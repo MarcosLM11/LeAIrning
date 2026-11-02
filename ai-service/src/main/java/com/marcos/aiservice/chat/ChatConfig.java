@@ -1,4 +1,4 @@
-package com.marcos.aiservice;
+package com.marcos.aiservice.chat;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
