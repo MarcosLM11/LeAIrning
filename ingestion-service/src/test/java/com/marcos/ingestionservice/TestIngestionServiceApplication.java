@@ -6,7 +6,7 @@ public class TestIngestionServiceApplication {
 
     static void main(String[] args) {
         SpringApplication.from(IngestionServiceApplication::main)
-                .with(TestcontainersConfiguration.class)
+                .with(TestcontainersConfiguration.class, FakeEmbeddingConfiguration.class)
                 .run(args);
     }
 

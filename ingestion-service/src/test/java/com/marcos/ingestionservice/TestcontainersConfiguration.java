@@ -27,12 +27,6 @@ class TestcontainersConfiguration {
     }
 
     @Bean
-    @ServiceConnection
-    PostgreSQLContainer postgresContainer() {
-        return new PostgreSQLContainer(DockerImageName.parse("postgres:18"));
-    }
-
-    @Bean
     GenericContainer<?> s3Container() {
         return new GenericContainer<>(DockerImageName.parse("rustfs/rustfs:1.0.4"))
                 .withEnv("RUSTFS_VOLUMES", "/data")

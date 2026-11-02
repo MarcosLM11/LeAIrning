@@ -9,3 +9,24 @@ spring:
       properties:
         spring.json.value.default.type: com.marcos.ingestionservice.FileUploadedEvent
         spring.json.use.type.headers: false
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fileservice
+    username: postgres
+    password: postgres
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-3-small
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 1536
+
+s3:
+  endpoint: http://localhost:9000
+  region: us-east-1
+  access-key: rustfsadmin
+  secret-key: rustfsadmin
+  bucket: files

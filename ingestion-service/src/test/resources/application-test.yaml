@@ -1,0 +1,16 @@
+spring:
+  ai:
+    openai:
+      api-key: test-not-used
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false
