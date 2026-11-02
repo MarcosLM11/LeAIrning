@@ -1,9 +1,22 @@
 spring:
   application:
     name: ai-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fileservice
+    username: postgres
+    password: postgres
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: gpt-5-nano
+          reasoning-effort: minimal
+    session:
+      repository:
+        jdbc:
+          initialize-schema: always
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG

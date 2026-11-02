@@ -6,6 +6,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import java.util.UUID;
 import reactor.core.publisher.Flux;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
@@ -23,20 +24,22 @@ class ChatControllerTest {
     @MockitoBean
     ChatService chatService;
 
+    private final UUID userId = UUID.randomUUID();
+
     @Test
     void chatReturnsModelAnswer() throws Exception {
-        given(chatService.ask("hola")).willReturn("buenas");
+        given(chatService.ask("hola", "1", userId)).willReturn("buenas");
 
-        mockMvc.perform(post("/chat").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        mockMvc.perform(post("/chat/{userId}", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("buenas"));
     }
 
     @Test
     void streamEmitsEachChunkAsSse() throws Exception {
-        given(chatService.stream("hola")).willReturn(Flux.just("Hola", " mundo"));
+        given(chatService.stream("hola", "1", userId)).willReturn(Flux.just("Hola", " mundo"));
 
-        var started = mockMvc.perform(post("/chat/stream").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        var started = mockMvc.perform(post("/chat/{userId}/stream", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
