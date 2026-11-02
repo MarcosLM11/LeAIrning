@@ -1,4 +1,4 @@
-package com.marcos.aiservice;
+package com.marcos.aiservice.chat;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
