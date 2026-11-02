@@ -14,7 +14,7 @@ public class QuizzController {
     private final QuizzService quizzService;
 
     @PostMapping("/quizz/{fileId}")
-    public Quizz generate(@PathVariable UUID fileId,
+    public GeneratedQuizz generate(@PathVariable UUID fileId,
                           @RequestParam(defaultValue = "MAP") Strategy strategy,
                           @RequestParam(defaultValue = "10") int questions,
                           @RequestParam(defaultValue = "4") int options,

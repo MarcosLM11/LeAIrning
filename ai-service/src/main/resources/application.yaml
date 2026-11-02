@@ -8,6 +8,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}

@@ -42,8 +42,8 @@ class QuizzServiceTest {
     @Test
     void failsWith502WhenModelReturnsNoValidQuestions() {
         when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of("texto"));
-        when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(Quizz.class), any(Consumer.class)))
-                .thenReturn(new Quizz(List.of(new QuizzQuestion("q", List.of("a"), 5, "e"))));
+        when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(GeneratedQuizz.class), any(Consumer.class)))
+                .thenReturn(new GeneratedQuizz(List.of(new GeneratedQuestion("q", List.of("a"), 5, "e"))));
 
         assertThatThrownBy(() -> service.generate(fileId, Strategy.FULL, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("502");
@@ -59,9 +59,9 @@ class QuizzServiceTest {
 
     @Test
     void onlyValidDropsBadQuestions() {
-        var good = new QuizzQuestion("q", List.of("a", "b", "c"), 2, "e");
-        var badIndex = new QuizzQuestion("q", List.of("a", "b", "c"), 3, "e");
-        var badSize = new QuizzQuestion("q", List.of("a", "b"), 0, "e");
+        var good = new GeneratedQuestion("q", List.of("a", "b", "c"), 2, "e");
+        var badIndex = new GeneratedQuestion("q", List.of("a", "b", "c"), 3, "e");
+        var badSize = new GeneratedQuestion("q", List.of("a", "b"), 0, "e");
 
         assertThat(QuizzService.onlyValid(List.of(good, badIndex, badSize), 3)).containsExactly(good);
     }

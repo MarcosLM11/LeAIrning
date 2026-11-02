@@ -38,7 +38,7 @@ public class QuizzService {
     private final ChatClient quizzChatClient;
     private final JdbcClient jdbc;
 
-    public Quizz generate(UUID fileId, Strategy strategy, int questions, int options, Difficulty difficulty) {
+    public GeneratedQuizz generate(UUID fileId, Strategy strategy, int questions, int options, Difficulty difficulty) {
         if (questions < 1 || questions > 50 || options < 2 || options > 6) {
             throw new ResponseStatusException(BAD_REQUEST, "questions must be 1-50 and options 2-6");
         }
@@ -57,20 +57,20 @@ public class QuizzService {
         return quizz;
     }
 
-    private Quizz map(List<String> chunks, int questions, int options, Difficulty difficulty) {
+    private GeneratedQuizz map(List<String> chunks, int questions, int options, Difficulty difficulty) {
         var sections = sections(chunks, questions);
-        var all = new ArrayList<QuizzQuestion>();
+        var all = new ArrayList<GeneratedQuestion>();
         for (int i = 0; i < sections.size(); i++) {
             all.addAll(ask(sections.get(i), share(questions, sections.size(), i), options, difficulty).questions());
         }
-        return new Quizz(all);
+        return new GeneratedQuizz(all);
     }
 
     static int share(int questions, int sections, int i) {
         return questions / sections + (i < questions % sections ? 1 : 0);
     }
 
-    private Quizz concepts(List<String> chunks, int questions, int options, Difficulty difficulty) {
+    private GeneratedQuizz concepts(List<String> chunks, int questions, int options, Difficulty difficulty) {
         var all = new ArrayList<String>();
         for (var section : sections(chunks, MAX_CONCEPT_SECTIONS)) {
             var found = quizzChatClient.prompt()
@@ -82,7 +82,7 @@ public class QuizzService {
         return ask(String.join("\n", all), questions, options, difficulty);
     }
 
-    private Quizz ask(String text, int n, int options, Difficulty difficulty) {
+    private GeneratedQuizz ask(String text, int n, int options, Difficulty difficulty) {
         var quizz = quizzChatClient.prompt()
                 .user(u -> u.text(QUESTIONS_PROMPT)
                         .param("n", n)
@@ -90,11 +90,11 @@ public class QuizzService {
                         .param("options", options)
                         .param("text", text))
                 .call()
-                .entity(Quizz.class, spec -> spec.useProviderStructuredOutput().validateSchema());
-        return new Quizz(onlyValid(quizz.questions(), options));
+                .entity(GeneratedQuizz.class, spec -> spec.useProviderStructuredOutput().validateSchema());
+        return new GeneratedQuizz(onlyValid(quizz.questions(), options));
     }
 
-    static List<QuizzQuestion> onlyValid(List<QuizzQuestion> questions, int options) {
+    static List<GeneratedQuestion> onlyValid(List<GeneratedQuestion> questions, int options) {
         return questions.stream()
                 .filter(q -> q.options().size() == options && q.correctIndex() >= 0 && q.correctIndex() < options)
                 .toList();
