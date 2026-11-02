@@ -1,3 +1,9 @@
 spring:
   application:
     name: ai-service
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-5-nano

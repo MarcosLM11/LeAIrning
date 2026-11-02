@@ -1,15 +1,17 @@
-name: CI
+name: ai-service CI
 
 on:
   push:
+    paths: [ai-service/**, .github/workflows/ai-service.yml]
   pull_request:
+    paths: [ai-service/**, .github/workflows/ai-service.yml]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: file-service
+        working-directory: ai-service
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -17,4 +19,5 @@ jobs:
           distribution: liberica
           java-version: 27
           cache: maven
+          cache-dependency-path: ai-service/pom.xml
       - run: ./mvnw -B verify
