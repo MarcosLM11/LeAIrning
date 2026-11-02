@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ingestion-service
+  kafka:
+    consumer:
+      group-id: ingestion-service
+      auto-offset-reset: earliest

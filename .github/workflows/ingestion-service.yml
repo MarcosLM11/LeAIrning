@@ -1,0 +1,23 @@
+name: ingestion-service CI
+
+on:
+  push:
+    paths: [ingestion-service/**, .github/workflows/ingestion-service.yml]
+  pull_request:
+    paths: [ingestion-service/**, .github/workflows/ingestion-service.yml]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ingestion-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 27
+          cache: maven
+          cache-dependency-path: ingestion-service/pom.xml
+      - run: ./mvnw -B verify
