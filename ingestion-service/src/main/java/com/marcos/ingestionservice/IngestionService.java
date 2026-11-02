@@ -30,6 +30,11 @@ class IngestionService {
         try (var in = s3.open(event.fileId().toString())) {
             var docs = extractor.extract(type, in, event);
             var chunks = chunker.chunk(docs);
+
+            for (int i = 0; i < chunks.size(); i++) {
+                chunks.get(i).getMetadata().put("chunkIndex", i);
+            }
+
             loader.load(event, chunks);
             log.info("Ingested {}: {} documents -> {} chunks", event.name(), docs.size(), chunks.size());
         }
