@@ -13,7 +13,7 @@ services:
       - s3-data:/data
 
   postgres:
-    image: postgres:18
+    image: pgvector/pgvector:pg18
     environment:
       POSTGRES_DB: fileservice
       POSTGRES_USER: postgres
@@ -24,7 +24,7 @@ services:
       - pg-data:/var/lib/postgresql
 
   kafka:
-    image: apache/kafka:4.1.0
+    image: apache/kafka:4.4.0
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -44,7 +44,7 @@ services:
       - kafka-data:/var/lib/kafka/data
 
   kafka-ui:
-    image: kafbat/kafka-ui:v1.2.0
+    image: kafbat/kafka-ui:v1.5.0
     depends_on:
       - kafka
     environment:

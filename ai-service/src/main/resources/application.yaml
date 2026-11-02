@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: ai-service
@@ -12,6 +15,12 @@ spring:
         options:
           model: gpt-5-nano
           reasoning-effort: minimal
+      embedding:
+        options:
+          model: text-embedding-3-small
+    vectorstore:
+      pgvector:
+        dimensions: 1536
     session:
       repository:
         jdbc:
