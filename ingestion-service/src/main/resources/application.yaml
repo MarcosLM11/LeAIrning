@@ -5,3 +5,7 @@ spring:
     consumer:
       group-id: ingestion-service
       auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.value.default.type: com.marcos.ingestionservice.FileUploadedEvent
+        spring.json.use.type.headers: false

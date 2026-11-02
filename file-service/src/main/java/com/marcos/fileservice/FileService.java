@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.marcos.fileservice.storage.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,10 +14,13 @@ class FileService {
 
     private final S3Service s3;
     private final FileMetadataRepository repository;
+    private final KafkaTemplate<String, FileUploadedEvent> kafka;
+    static final String FILE_UPLOADED_TOPIC = "file.uploaded";
 
-    FileService(S3Service s3, FileMetadataRepository repository) {
+    FileService(S3Service s3, FileMetadataRepository repository, KafkaTemplate<String, FileUploadedEvent> kafka) {
         this.s3 = s3;
         this.repository = repository;
+        this.kafka = kafka;
     }
 
     UUID upload(HttpServletRequest request, String name) {
@@ -39,6 +43,14 @@ class FileService {
         }
         file.setStatus(FileStatus.UPLOADED);
         repository.save(file);
+        kafka.send(FILE_UPLOADED_TOPIC, key.toString(), FileUploadedEvent.builder()
+                .fileId(key)
+                .userId("user")
+                .name(file.getName())
+                .contentType(file.getContentType())
+                .size(file.getSize())
+                .uploadedAt(file.getUploadedAt())
+                .build());
         return key;
     }
 

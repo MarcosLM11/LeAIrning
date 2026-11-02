@@ -11,6 +11,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
   jpa:
     open-in-view: false
     hibernate:
