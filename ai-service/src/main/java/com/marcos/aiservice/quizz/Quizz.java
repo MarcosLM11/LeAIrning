@@ -43,7 +43,6 @@ class Quizz {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    // A question is identified by its position in this list.
     @Setter
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false)

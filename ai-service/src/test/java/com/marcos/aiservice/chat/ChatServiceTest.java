@@ -19,13 +19,13 @@ class ChatServiceTest {
 
     @Test
     void askReturnsContent() {
-        when(chatClient.prompt().user("hola").advisors(any(Consumer.class)).tools(any(Object[].class)).call().content()).thenReturn("buenas");
+        when(chatClient.prompt().user("hola").advisors(any(Consumer.class)).call().content()).thenReturn("buenas");
         assertThat(service.ask("hola", "1", userId)).isEqualTo("buenas");
     }
 
     @Test
     void streamReturnsChunks() {
-        when(chatClient.prompt().user("hola").advisors(any(Consumer.class)).tools(any(Object[].class)).stream().content()).thenReturn(Flux.just("Hola", " mundo"));
+        when(chatClient.prompt().user("hola").advisors(any(Consumer.class)).stream().content()).thenReturn(Flux.just("Hola", " mundo"));
         assertThat(service.stream("hola", "1", userId).collectList().block()).containsExactly("Hola", " mundo");
     }
 }
