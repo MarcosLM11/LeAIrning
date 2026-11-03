@@ -1,9 +1,15 @@
-import { useState, type FormEvent } from 'react'
-import { login } from './api'
+import { useEffect, useState, type FormEvent } from 'react'
+import { login, logout, refresh } from './api'
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  // Restore the session from the httpOnly refresh cookie on page load.
+  useEffect(() => {
+    refresh().then(setToken).catch(() => {}).finally(() => setLoading(false))
+  }, [])
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -17,16 +23,19 @@ export default function App() {
     }
   }
 
-  function logout() {
+  async function onLogout() {
+    await logout().catch(() => {})
     setToken(null)
   }
+
+  if (loading) return null
 
   if (token) {
     return (
       <>
         <h1>LeAIrning</h1>
         <p>Sesión iniciada.</p>
-        <button onClick={logout}>Salir</button>
+        <button onClick={onLogout}>Salir</button>
       </>
     )
   }
