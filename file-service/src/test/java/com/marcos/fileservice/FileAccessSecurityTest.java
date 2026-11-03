@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
@@ -50,6 +51,19 @@ class FileAccessSecurityTest {
         mvc.perform(delete("/api/v1/files/" + key).with(user(owner, "ROLE_USER")))
                 .andExpect(status().isNoContent());
         verify(s3).delete(key.toString());
+    }
+
+    @Test
+    void listReturnsOnlyOwnFiles() throws Exception {
+        var mine = repository.save(new FileMetadata("mine.txt", "text/plain", 3, owner)).getId();
+        repository.save(new FileMetadata("theirs.txt", "text/plain", 3, UUID.randomUUID()));
+
+        mvc.perform(get("/api/v1/files")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/v1/files").with(user(owner, "ROLE_USER")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(mine.toString()))
+                .andExpect(jsonPath("$[0].name").value("mine.txt"));
     }
 
     private static RequestPostProcessor user(UUID id, String role) {

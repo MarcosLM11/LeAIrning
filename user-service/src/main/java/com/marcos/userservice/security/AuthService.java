@@ -37,6 +37,7 @@ class AuthService {
                 .issuedAt(now)
                 .expiresAt(now.plus(TTL))
                 .claim("roles", List.of(user.getRole().name()))
+                .claim("email", user.getEmail())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))

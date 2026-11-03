@@ -1,5 +1,6 @@
 package com.marcos.fileservice;
 
+import java.util.List;
 import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
@@ -31,6 +32,11 @@ class FileController {
                                   Authentication auth) {
         var key = service.upload(request, name, userId(auth));
         return ResponseEntity.ok("uploaded file: " + key);
+    }
+
+    @GetMapping
+    List<FileResponse> list(Authentication auth) {
+        return service.list(userId(auth));
     }
 
     @GetMapping("/{key}")

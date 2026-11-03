@@ -1,5 +1,6 @@
 package com.marcos.userservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -16,6 +17,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -25,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 class UserControllerTest {
 
     @Autowired MockMvc mvc;
+    @Autowired JwtDecoder jwtDecoder;
 
     @Test
     void crudFlow() throws Exception {
@@ -46,6 +49,9 @@ class UserControllerTest {
         var token = "Bearer " + JsonPath.read(
                 mvc.perform(login(username, "password1")).andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString(), "$.accessToken");
+
+        var claims = jwtDecoder.decode(token.substring("Bearer ".length())).getClaims();
+        assertThat(claims).containsEntry("email", email).containsEntry("sub", id);
 
         mvc.perform(get("/api/v1/users/" + id).header("Authorization", token))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Ana"));

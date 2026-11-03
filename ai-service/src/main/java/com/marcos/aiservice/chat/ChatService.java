@@ -1,7 +1,9 @@
 package com.marcos.aiservice.chat;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.session.SessionService;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class ChatService {
                 .advisors(a -> a
                         .param(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, sessionId(userId, conversationId))
                         .param(SessionMemoryAdvisor.USER_ID_CONTEXT_KEY, userId.toString())
+                        .param(VectorStoreDocumentRetriever.FILTER_EXPRESSION, new FilterExpressionBuilder().eq("userId", userId.toString()).build())
                 );
     }
 

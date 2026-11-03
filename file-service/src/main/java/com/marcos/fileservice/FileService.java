@@ -2,6 +2,7 @@ package com.marcos.fileservice;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 import com.marcos.fileservice.storage.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,6 +58,10 @@ public class FileService {
     private void markFailed(FileMetadata file) {
         file.setStatus(FileStatus.FAILED);
         repository.save(file);
+    }
+
+    List<FileResponse> list(UUID ownerId) {
+        return repository.findByOwnerId(ownerId).stream().map(FileResponse::from).toList();
     }
 
     public boolean isOwner(UUID key, String userId) {
