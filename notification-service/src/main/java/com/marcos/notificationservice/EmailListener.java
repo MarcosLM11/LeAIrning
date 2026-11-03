@@ -13,7 +13,6 @@ import org.springframework.validation.annotation.Validated;
 class EmailListener {
 
     static final String TOPIC = "notification.email";
-
     private final EmailService service;
 
     @KafkaListener(topics = TOPIC)

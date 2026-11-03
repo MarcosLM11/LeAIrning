@@ -53,6 +53,12 @@ services:
     ports:
       - "8085:8080"   # Kafka UI (8080 queda libre para los servicios)
 
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
   grafana:
     image: grafana/otel-lgtm:0.39.0
     ports:

@@ -3,7 +3,7 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for ai-service" enabled="true">
+      <profile name="Annotation profile for notification-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -11,6 +11,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.48/lombok-1.18.48.jar" />
         </processorPath>
         <module name="file-service" />
+        <module name="notification-service" />
         <module name="ai-service" />
         <module name="ingestion-service" />
       </profile>
@@ -21,6 +22,7 @@
       <module name="ai-service" options="-parameters" />
       <module name="file-service" options="-parameters" />
       <module name="ingestion-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
     </option>
   </component>
 </project>

@@ -14,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class QuizzService {
 
     static final String TOPIC = "quizz.requested";
-
     private final QuizzRepository repository;
     private final KafkaTemplate<String, QuizzRequestedEvent> kafka;
 

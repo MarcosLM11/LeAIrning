@@ -14,7 +14,6 @@ class EmailService {
     private final JavaMailSender mailSender;
     private final NotificationRepository repository;
 
-    // shortcut: a failed send is recorded as FAILED and not retried; add retry + dead-letter topic if mails must not be lost.
     void send(EmailRequestedEvent event) {
         var status = NotificationStatus.SENT;
         try {
