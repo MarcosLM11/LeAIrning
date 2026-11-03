@@ -24,21 +24,19 @@ class QuizzRepositoryTest {
     private TestEntityManager em;
 
     @Test
-    void savesQuestionsInOrderWithOptionsAsJson() {
-        var userId = UUID.randomUUID();
-        var quizz = new Quizz(UUID.randomUUID(), userId, Strategy.MAP);
-        quizz.getQuestions().add(new Question("first?", List.of("a", "b", "c"), 1, "because"));
-        quizz.getQuestions().add(new Question("second?", List.of("x", "y"), 0, null));
+    void savesQuestionsInOrderAsJson() {
+        var quizz = new Quizz(UUID.randomUUID(), UUID.randomUUID());
+        quizz.setQuestions(List.of(
+                new GeneratedQuestion("first?", List.of("a", "b", "c"), 1, "because"),
+                new GeneratedQuestion("second?", List.of("x", "y"), 0, null)));
         var id = repository.saveAndFlush(quizz).getId();
         em.clear();
 
-        var found = repository.findByUserId(userId);
+        var found = repository.findById(id).orElseThrow();
 
-        assertThat(found).hasSize(1);
-        assertThat(found.getFirst().getId()).isEqualTo(id);
-        assertThat(found.getFirst().getStatus()).isEqualTo(QuizzStatus.PENDING);
-        assertThat(found.getFirst().getCreatedAt()).isNotNull();
-        assertThat(found.getFirst().getQuestions()).extracting(Question::getText).containsExactly("first?", "second?");
-        assertThat(found.getFirst().getQuestions().getFirst().getOptions()).containsExactly("a", "b", "c");
+        assertThat(found.getStatus()).isEqualTo(QuizzStatus.PENDING);
+        assertThat(found.getCreatedAt()).isNotNull();
+        assertThat(found.getQuestions()).extracting(GeneratedQuestion::question).containsExactly("first?", "second?");
+        assertThat(found.getQuestions().getFirst().options()).containsExactly("a", "b", "c");
     }
 }

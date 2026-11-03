@@ -1,6 +1,5 @@
 package com.marcos.aiservice.quizz;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,9 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderColumn;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -36,10 +34,6 @@ class Quizz {
     @Column(nullable = false)
     private UUID userId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Strategy strategy;
-
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,14 +43,14 @@ class Quizz {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "quizz_id")
-    @OrderColumn(name = "question_order")
-    private List<Question> questions = new ArrayList<>();
+    // A question is identified by its position in this list.
+    @Setter
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(nullable = false)
+    private List<GeneratedQuestion> questions = new ArrayList<>();
 
-    Quizz(UUID fileId, UUID userId, Strategy strategy) {
+    Quizz(UUID fileId, UUID userId) {
         this.fileId = fileId;
         this.userId = userId;
-        this.strategy = strategy;
     }
 }

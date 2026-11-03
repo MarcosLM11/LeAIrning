@@ -25,7 +25,7 @@ class QuizzServiceTest {
     private final UUID id = UUID.randomUUID();
 
     private Quizz pendingQuizz() {
-        var quizz = new Quizz(fileId, userId, Strategy.MAP);
+        var quizz = new Quizz(fileId, userId);
         ReflectionTestUtils.setField(quizz, "id", id);
         when(repository.findById(id)).thenReturn(Optional.of(quizz));
         return quizz;
@@ -33,9 +33,9 @@ class QuizzServiceTest {
 
     @Test
     void startRejectsOutOfRangeParams() {
-        assertThatThrownBy(() -> service.start(userId, fileId, Strategy.MAP, 0, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> service.start(userId, fileId, 0, 4, Difficulty.MEDIO))
                 .hasMessageContaining("400");
-        assertThatThrownBy(() -> service.start(userId, fileId, Strategy.MAP, 10, 7, Difficulty.MEDIO))
+        assertThatThrownBy(() -> service.start(userId, fileId, 10, 7, Difficulty.MEDIO))
                 .hasMessageContaining("400");
     }
 
@@ -47,11 +47,11 @@ class QuizzServiceTest {
             return saved;
         });
 
-        var result = service.start(userId, fileId, Strategy.CONCEPTS, 5, 3, Difficulty.FACIL);
+        var result = service.start(userId, fileId, 5, 3, Difficulty.FACIL);
 
         assertThat(result).isEqualTo(id);
         verify(kafka).send(QuizzService.TOPIC, id.toString(),
-                new QuizzRequestedEvent(id, fileId, Strategy.CONCEPTS, 5, 3, Difficulty.FACIL));
+                new QuizzRequestedEvent(id, fileId, 5, 3, Difficulty.FACIL));
     }
 
     @Test
@@ -68,7 +68,7 @@ class QuizzServiceTest {
         service.complete(id, new GeneratedQuizz(List.of(new GeneratedQuestion("q?", List.of("a", "b"), 1, "e"))));
 
         assertThat(quizz.getStatus()).isEqualTo(QuizzStatus.READY);
-        assertThat(quizz.getQuestions()).extracting(Question::getText).containsExactly("q?");
+        assertThat(quizz.getQuestions()).extracting(GeneratedQuestion::question).containsExactly("q?");
     }
 
     @Test

@@ -18,16 +18,15 @@ public class QuizzService {
     private final QuizzRepository repository;
     private final KafkaTemplate<String, QuizzRequestedEvent> kafka;
 
-    public UUID start(UUID userId, UUID fileId, Strategy strategy, int questions, int options, Difficulty difficulty) {
+    public UUID start(UUID userId, UUID fileId, int questions, int options, Difficulty difficulty) {
         if (questions < 1 || questions > 50 || options < 2 || options > 6) {
             throw new ResponseStatusException(BAD_REQUEST, "questions must be 1-50 and options 2-6");
         }
-        var id = repository.save(new Quizz(fileId, userId, strategy)).getId();
-        kafka.send(TOPIC, id.toString(), new QuizzRequestedEvent(id, fileId, strategy, questions, options, difficulty));
+        var id = repository.save(new Quizz(fileId, userId)).getId();
+        kafka.send(TOPIC, id.toString(), new QuizzRequestedEvent(id, fileId, questions, options, difficulty));
         return id;
     }
 
-    @Transactional(readOnly = true)
     public QuizzView get(UUID userId, UUID id) {
         return repository.findById(id)
                 .filter(quizz -> quizz.getUserId().equals(userId))
@@ -37,12 +36,8 @@ public class QuizzService {
 
     @Transactional
     public void complete(UUID id, GeneratedQuizz generated) {
-        repository.findById(id).filter(quizz -> quizz.getStatus() == QuizzStatus.PENDING)
-                .ifPresent(quizz -> {
-                    generated.questions().forEach(q ->
-                        quizz.getQuestions()
-                                .add(new Question(q.question(), q.options(), q.correctIndex(), q.explanation()))
-                    );
+        repository.findById(id).filter(quizz -> quizz.getStatus() == QuizzStatus.PENDING).ifPresent(quizz -> {
+            quizz.setQuestions(generated.questions());
             quizz.setStatus(QuizzStatus.READY);
         });
     }

@@ -27,7 +27,7 @@ class QuizzGeneratorTest {
     void failsWhenFileHasNoContent() {
         when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> generator.generate(fileId, Strategy.MAP, 10, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> generator.generate(fileId, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("No content");
     }
 
@@ -37,7 +37,7 @@ class QuizzGeneratorTest {
         when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(GeneratedQuizz.class), any(Consumer.class)))
                 .thenReturn(new GeneratedQuizz(List.of(new GeneratedQuestion("q", List.of("a"), 5, "e"))));
 
-        assertThatThrownBy(() -> generator.generate(fileId, Strategy.FULL, 10, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> generator.generate(fileId, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("no valid questions");
     }
 

@@ -20,11 +20,10 @@ public class QuizzController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public UUID start(@PathVariable UUID userId,
                       @PathVariable UUID fileId,
-                      @RequestParam(defaultValue = "MAP") Strategy strategy,
                       @RequestParam(defaultValue = "10") int questions,
                       @RequestParam(defaultValue = "4") int options,
                       @RequestParam(defaultValue = "MEDIO") Difficulty difficulty) {
-        return quizzService.start(userId, fileId, strategy, questions, options, difficulty);
+        return quizzService.start(userId, fileId, questions, options, difficulty);
     }
 
     @GetMapping("/quizz/{userId}/{id}")
