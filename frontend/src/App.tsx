@@ -1,23 +1,25 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { login, logout, refresh, setToken as storeToken } from './api'
+import { login, logout, refresh } from './api'
+import Chat from './Chat'
 import Files from './Files'
+import Quizz from './Quizz'
 
 export default function App() {
-  const [token, setToken] = useState<string | null>(null)
+  const [loggedIn, setLoggedIn] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
   // Restore the session from the httpOnly refresh cookie on page load.
   useEffect(() => {
-    refresh().then(setToken).catch(() => {}).finally(() => setLoading(false))
+    refresh().then(() => setLoggedIn(true)).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = new FormData(e.currentTarget)
     try {
-      const t = await login(String(form.get('identifier')), String(form.get('password')))
-      setToken(t)
+      await login(String(form.get('identifier')), String(form.get('password')))
+      setLoggedIn(true)
       setError('')
     } catch (err) {
       setError((err as Error).message)
@@ -26,19 +28,19 @@ export default function App() {
 
   async function onLogout() {
     await logout().catch(() => {})
-    setToken(null)
+    setLoggedIn(false)
   }
-
-  storeToken(token)
 
   if (loading) return null
 
-  if (token) {
+  if (loggedIn) {
     return (
       <>
         <h1>LeAIrning</h1>
         <button onClick={onLogout}>Salir</button>
         <Files />
+        <Chat />
+        <Quizz />
       </>
     )
   }
