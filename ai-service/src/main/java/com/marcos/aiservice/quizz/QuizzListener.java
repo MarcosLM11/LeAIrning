@@ -16,7 +16,7 @@ class QuizzListener {
     @KafkaListener(topics = QuizzService.TOPIC)
     void onQuizzRequested(QuizzRequestedEvent event) {
         try {
-            service.complete(event.quizzId(), generator.generate(event.fileId(), event.questions(), event.options(), event.difficulty()));
+            service.complete(event.quizzId(), generator.generate(event.userId(), event.fileId(), event.questions(), event.options(), event.difficulty()));
         } catch (Exception e) {
             log.error("Quizz {} failed", event.quizzId(), e);
             service.fail(event.quizzId());

@@ -3,6 +3,7 @@ package com.marcos.aiservice.quizz;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,18 +17,22 @@ public class QuizzController {
 
     private final QuizzService quizzService;
 
-    @PostMapping("/quizz/{userId}/{fileId}")
+    @PostMapping("/quizz/{fileId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public UUID start(@PathVariable UUID userId,
-                      @PathVariable UUID fileId,
+    public UUID start(@PathVariable UUID fileId,
                       @RequestParam(defaultValue = "10") int questions,
                       @RequestParam(defaultValue = "4") int options,
-                      @RequestParam(defaultValue = "MEDIO") Difficulty difficulty) {
-        return quizzService.start(userId, fileId, questions, options, difficulty);
+                      @RequestParam(defaultValue = "MEDIO") Difficulty difficulty,
+                      Authentication auth) {
+        return quizzService.start(userId(auth), fileId, questions, options, difficulty);
     }
 
-    @GetMapping("/quizz/{userId}/{id}")
-    public QuizzView get(@PathVariable UUID userId, @PathVariable UUID id) {
-        return quizzService.get(userId, id);
+    @GetMapping("/quizz/{id}")
+    public QuizzView get(@PathVariable UUID id, Authentication auth) {
+        return quizzService.get(userId(auth), id);
+    }
+
+    private static UUID userId(Authentication auth) {
+        return UUID.fromString(auth.getName());
     }
 }

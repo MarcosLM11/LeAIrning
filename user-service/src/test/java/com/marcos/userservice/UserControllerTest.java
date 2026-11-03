@@ -1,5 +1,6 @@
 package com.marcos.userservice;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -54,6 +56,36 @@ class UserControllerTest {
 
         mvc.perform(delete("/api/v1/users/" + id).header("Authorization", token)).andExpect(status().isNoContent());
         mvc.perform(get("/api/v1/users/" + id).header("Authorization", token)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void onlyOwnerOrAdminCanTouchAUser() throws Exception {
+        var a = "a" + UUID.randomUUID();
+        var b = "b" + UUID.randomUUID();
+        var idA = register(a);
+        var idB = register(b);
+        var tokenA = "Bearer " + JsonPath.read(
+                mvc.perform(login(a, "password1")).andReturn().getResponse().getContentAsString(), "$.accessToken");
+
+        mvc.perform(get("/api/v1/users/" + idA).header("Authorization", tokenA)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/users/" + idB).header("Authorization", tokenA)).andExpect(status().isForbidden());
+        mvc.perform(put("/api/v1/users/" + idB).header("Authorization", tokenA)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"X\"}")).andExpect(status().isForbidden());
+        mvc.perform(delete("/api/v1/users/" + idB).header("Authorization", tokenA)).andExpect(status().isForbidden());
+        mvc.perform(get("/api/v1/users").header("Authorization", tokenA)).andExpect(status().isForbidden());
+
+        var admin = jwt().jwt(j -> j.subject(UUID.randomUUID().toString()))
+                .authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        mvc.perform(get("/api/v1/users").with(admin)).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/users/" + idB).with(admin)).andExpect(status().isOk());
+    }
+
+    private String register(String username) throws Exception {
+        var body = mvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"" + username + "@test.com\",\"name\":\"N\",\"username\":\"" + username
+                                + "\",\"password\":\"password1\"}"))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        return JsonPath.read(body, "$.id");
     }
 
     private static MockHttpServletRequestBuilder login(String identifier, String password) {

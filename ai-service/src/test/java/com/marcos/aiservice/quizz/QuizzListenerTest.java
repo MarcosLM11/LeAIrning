@@ -13,12 +13,12 @@ class QuizzListenerTest {
     private final QuizzService service = mock(QuizzService.class);
     private final QuizzListener listener = new QuizzListener(generator, service);
     private final QuizzRequestedEvent event =
-            new QuizzRequestedEvent(UUID.randomUUID(), UUID.randomUUID(), 5, 4, Difficulty.MEDIO);
+            new QuizzRequestedEvent(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), 5, 4, Difficulty.MEDIO);
 
     @Test
     void completesQuizzWithGeneratedQuestions() {
         var generated = new GeneratedQuizz(List.of(new GeneratedQuestion("q?", List.of("a", "b"), 0, "e")));
-        when(generator.generate(event.fileId(), 5, 4, Difficulty.MEDIO)).thenReturn(generated);
+        when(generator.generate(event.userId(), event.fileId(), 5, 4, Difficulty.MEDIO)).thenReturn(generated);
 
         listener.onQuizzRequested(event);
 
@@ -27,7 +27,7 @@ class QuizzListenerTest {
 
     @Test
     void marksQuizzFailedWhenGenerationThrows() {
-        when(generator.generate(event.fileId(), 5, 4, Difficulty.MEDIO))
+        when(generator.generate(event.userId(), event.fileId(), 5, 4, Difficulty.MEDIO))
                 .thenThrow(new IllegalStateException("boom"));
 
         listener.onQuizzRequested(event);

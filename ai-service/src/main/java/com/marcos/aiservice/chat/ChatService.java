@@ -33,22 +33,26 @@ public class ChatService {
         return chatClient.prompt()
                 .user(question)
                 .advisors(a -> a
-                        .param(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, conversationId)
+                        .param(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, sessionId(userId, conversationId))
                         .param(SessionMemoryAdvisor.USER_ID_CONTEXT_KEY, userId.toString())
                 );
     }
 
-    public List<Message> history(String conversationId) {
-        return sessionService.getMessages(conversationId);
+    private static String sessionId(UUID userId, String conversationId) {
+        return userId + ":" + conversationId;
     }
 
-    public List<String> shortHistory(String conversationId) {
-        return sessionService.getMessages(conversationId).stream()
+    public List<Message> history(String conversationId, UUID userId) {
+        return sessionService.getMessages(sessionId(userId, conversationId));
+    }
+
+    public List<String> shortHistory(String conversationId, UUID userId) {
+        return sessionService.getMessages(sessionId(userId, conversationId)).stream()
                 .map(m -> m.getMessageType() + ": " + m.getText())
                 .toList();
     }
 
-    public void clearHistory(String conversationId) {
-        sessionService.delete(conversationId);
+    public void clearHistory(String conversationId, UUID userId) {
+        sessionService.delete(sessionId(userId, conversationId));
     }
 }

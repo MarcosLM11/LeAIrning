@@ -1,6 +1,6 @@
 package com.marcos.aiservice.chat;
 
-import com.marcos.aiservice.SecurityConfig;
+import com.marcos.aiservice.security.SecurityConfig;
 import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ class ChatControllerTest {
     void chatReturnsModelAnswer() throws Exception {
         given(chatService.ask("hola", "1", userId)).willReturn("buenas");
 
-        mockMvc.perform(post("/chat/{userId}", userId).with(jwt()).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        mockMvc.perform(post("/chat").with(jwt().jwt(j -> j.subject(userId.toString()))).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("buenas"));
     }
@@ -43,7 +43,7 @@ class ChatControllerTest {
     void streamEmitsEachChunkAsSse() throws Exception {
         given(chatService.stream("hola", "1", userId)).willReturn(Flux.just("Hola", " mundo"));
 
-        var started = mockMvc.perform(post("/chat/{userId}/stream", userId).with(jwt()).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        var started = mockMvc.perform(post("/chat/stream").with(jwt().jwt(j -> j.subject(userId.toString()))).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
@@ -55,7 +55,7 @@ class ChatControllerTest {
 
     @Test
     void chatWithoutTokenIsUnauthorized() throws Exception {
-        mockMvc.perform(post("/chat/{userId}", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        mockMvc.perform(post("/chat").param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(status().isUnauthorized());
     }
 }

@@ -21,23 +21,24 @@ class QuizzGeneratorTest {
     private final ChatClient chatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
     private final JdbcClient jdbc = mock(JdbcClient.class, Answers.RETURNS_DEEP_STUBS);
     private final QuizzGenerator generator = new QuizzGenerator(chatClient, jdbc);
+    private final UUID userId = UUID.randomUUID();
     private final UUID fileId = UUID.randomUUID();
 
     @Test
     void failsWhenFileHasNoContent() {
-        when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of());
+        when(jdbc.sql(anyString()).param(anyString(), any()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of());
 
-        assertThatThrownBy(() -> generator.generate(fileId, 10, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> generator.generate(userId, fileId, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("No content");
     }
 
     @Test
     void failsWhenModelReturnsNoValidQuestions() {
-        when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of("texto"));
+        when(jdbc.sql(anyString()).param(anyString(), any()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of("texto"));
         when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(GeneratedQuizz.class), any(Consumer.class)))
                 .thenReturn(new GeneratedQuizz(List.of(new GeneratedQuestion("q", List.of("a"), 5, "e"))));
 
-        assertThatThrownBy(() -> generator.generate(fileId, 10, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> generator.generate(userId, fileId, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("no valid questions");
     }
 

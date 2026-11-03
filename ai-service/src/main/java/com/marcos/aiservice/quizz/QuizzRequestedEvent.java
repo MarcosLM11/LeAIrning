@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record QuizzRequestedEvent(
         UUID quizzId,
+        UUID userId,
         UUID fileId,
         int questions,
         int options,

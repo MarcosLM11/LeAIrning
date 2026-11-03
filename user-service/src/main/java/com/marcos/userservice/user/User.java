@@ -13,7 +13,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

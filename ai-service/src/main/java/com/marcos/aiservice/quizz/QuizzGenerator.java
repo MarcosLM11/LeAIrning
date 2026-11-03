@@ -25,8 +25,8 @@ class QuizzGenerator {
     private final JdbcClient jdbc;
 
     /** Splits the document into sections and asks for a share of the questions from each one. */
-    GeneratedQuizz generate(UUID fileId, int questions, int options, Difficulty difficulty) {
-        var chunks = chunks(fileId);
+    GeneratedQuizz generate(UUID userId, UUID fileId, int questions, int options, Difficulty difficulty) {
+        var chunks = chunks(userId, fileId);
         if (chunks.isEmpty()) {
             throw new IllegalStateException("No content for file " + fileId);
         }
@@ -63,13 +63,14 @@ class QuizzGenerator {
                 .toList();
     }
 
-    private List<String> chunks(UUID fileId) {
+    private List<String> chunks(UUID userId, UUID fileId) {
         return jdbc.sql("""
                         select content from vector_store
-                        where metadata->>'fileId' = :fileId
+                        where metadata->>'fileId' = :fileId and metadata->>'userId' = :userId
                         order by coalesce((metadata->>'chunkIndex')::int, 0)
                         """)
                 .param("fileId", fileId.toString())
+                .param("userId", userId.toString())
                 .query(String.class)
                 .list();
     }

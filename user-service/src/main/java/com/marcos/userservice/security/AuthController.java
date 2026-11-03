@@ -1,6 +1,5 @@
 package com.marcos.userservice.security;
 
-import com.marcos.userservice.user.LoginRequest;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

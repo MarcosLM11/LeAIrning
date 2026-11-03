@@ -1,4 +1,4 @@
-package com.marcos.fileservice;
+package com.marcos.fileservice.security;
 
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;

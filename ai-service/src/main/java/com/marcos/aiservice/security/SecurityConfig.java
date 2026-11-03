@@ -1,4 +1,4 @@
-package com.marcos.aiservice;
+package com.marcos.aiservice.security;
 
 import java.nio.charset.StandardCharsets;
 import javax.crypto.spec.SecretKeySpec;

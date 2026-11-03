@@ -51,7 +51,7 @@ class QuizzServiceTest {
 
         assertThat(result).isEqualTo(id);
         verify(kafka).send(QuizzService.TOPIC, id.toString(),
-                new QuizzRequestedEvent(id, fileId, 5, 3, Difficulty.FACIL));
+                new QuizzRequestedEvent(id, userId, fileId, 5, 3, Difficulty.FACIL));
     }
 
     @Test
