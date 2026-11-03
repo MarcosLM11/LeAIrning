@@ -2,6 +2,7 @@ package com.marcos.fileservice;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
@@ -23,6 +26,8 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 class FileControllerTest {
 
     private static final UUID ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private static final UUID USER = UUID.fromString("22222222-2222-2222-2222-222222222222");
+    private static final Authentication AUTH = new TestingAuthenticationToken(USER.toString(), null, "ROLE_USER");
     private final FileService service = mock(FileService.class);
     private final MockMvc mvc = MockMvcBuilders
             .standaloneSetup(new FileController(service))
@@ -31,9 +36,9 @@ class FileControllerTest {
 
     @Test
     void returnsKeyOfUploadedFile() throws Exception {
-        when(service.upload(any(HttpServletRequest.class), any())).thenReturn(ID);
+        when(service.upload(any(HttpServletRequest.class), any(), eq(USER))).thenReturn(ID);
 
-        mvc.perform(post("/api/v1/files").contentType("text/plain").content("hey"))
+        mvc.perform(post("/api/v1/files").principal(AUTH).contentType("text/plain").content("hey"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("uploaded file: " + ID));
     }
@@ -42,7 +47,7 @@ class FileControllerTest {
     void downloadsFileBytes() throws Exception {
         when(service.download(ID)).thenReturn(new ByteArrayInputStream("hey".getBytes()));
 
-        mvc.perform(get("/api/v1/files/" + ID)).andExpect(status().isOk()).andExpect(content().string("hey"));
+        mvc.perform(get("/api/v1/files/" + ID).principal(AUTH)).andExpect(status().isOk()).andExpect(content().string("hey"));
     }
 
     @Test
@@ -50,7 +55,7 @@ class FileControllerTest {
         doThrow(new CompletionException(NoSuchKeyException.builder().build()))
                 .when(service).assertExists(ID);
 
-        mvc.perform(get("/api/v1/files/" + ID))
+        mvc.perform(get("/api/v1/files/" + ID).principal(AUTH))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType("application/problem+json"))
                 .andExpect(jsonPath("$.detail").value("File not found"));
@@ -59,12 +64,12 @@ class FileControllerTest {
     @Test
     void otherStorageFailureIs502() throws Exception {
         doThrow(new CompletionException(new RuntimeException("boom"))).when(service).assertExists(ID);
-        mvc.perform(get("/api/v1/files/" + ID)).andExpect(status().isBadGateway());
+        mvc.perform(get("/api/v1/files/" + ID).principal(AUTH)).andExpect(status().isBadGateway());
     }
 
     @Test
     void deleteReturns204() throws Exception {
-        mvc.perform(delete("/api/v1/files/" + ID)).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/v1/files/" + ID).principal(AUTH)).andExpect(status().isNoContent());
         verify(service).delete(ID);
     }
 }

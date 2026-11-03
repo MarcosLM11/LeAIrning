@@ -1,12 +1,13 @@
 package com.marcos.fileservice;
 
-import java.io.IOException;
 import java.util.UUID;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +27,14 @@ class FileController {
     }
 
     @PostMapping
-    ResponseEntity<String> upload(HttpServletRequest request, @RequestParam(required = false) String name) {
-        var key = service.upload(request, name);
+    ResponseEntity<String> upload(HttpServletRequest request, @RequestParam(required = false) String name,
+                                  Authentication auth) {
+        var key = service.upload(request, name, userId(auth));
         return ResponseEntity.ok("uploaded file: " + key);
     }
 
     @GetMapping("/{key}")
+    @PreAuthorize("hasRole('ADMIN') or @fileService.isOwner(#key, authentication.name)")
     ResponseEntity<Resource> download(@PathVariable UUID key) {
         service.assertExists(key);
         return ResponseEntity.ok()
@@ -40,8 +43,14 @@ class FileController {
     }
 
     @DeleteMapping("/{key}")
+    @PreAuthorize("hasRole('ADMIN') or @fileService.isOwner(#key, authentication.name)")
     ResponseEntity<Void> delete(@PathVariable UUID key) {
         service.delete(key);
         return ResponseEntity.noContent().build();
+    }
+
+    // the JWT subject is the user id (see user-service)
+    private static UUID userId(Authentication auth) {
+        return UUID.fromString(auth.getName());
     }
 }

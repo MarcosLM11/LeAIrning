@@ -10,7 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-class FileService {
+public class FileService {
 
     private final S3Service s3;
     private final FileMetadataRepository repository;
@@ -23,13 +23,13 @@ class FileService {
         this.kafka = kafka;
     }
 
-    UUID upload(HttpServletRequest request, String name) {
+    UUID upload(HttpServletRequest request, String name, UUID ownerId) {
         //validate length > 0, virus scan, tipo válido
         var length = request.getContentLengthLong();
         var contentType = request.getContentType() != null
                 ? request.getContentType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        var file = repository.save(new FileMetadata(name != null ? name : "unnamed", contentType, length));
+        var file = repository.save(new FileMetadata(name != null ? name : "unnamed", contentType, length, ownerId));
         var key = file.getId();
 
         try {
@@ -45,7 +45,7 @@ class FileService {
         repository.save(file);
         kafka.send(FILE_UPLOADED_TOPIC, key.toString(), FileUploadedEvent.builder()
                 .fileId(key)
-                .userId("user")
+                .userId(ownerId.toString())
                 .name(file.getName())
                 .contentType(file.getContentType())
                 .size(file.getSize())
@@ -57,6 +57,12 @@ class FileService {
     private void markFailed(FileMetadata file) {
         file.setStatus(FileStatus.FAILED);
         repository.save(file);
+    }
+
+    public boolean isOwner(UUID key, String userId) {
+        return repository.findById(key)
+                .map(f -> f.getOwnerId() != null && f.getOwnerId().toString().equals(userId))
+                .orElse(false);
     }
 
     void assertExists(UUID key) {

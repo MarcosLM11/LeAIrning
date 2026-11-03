@@ -28,6 +28,10 @@ class FileMetadata {
 
     private long size;
 
+    // nullable: files uploaded before ownership existed have no owner (only ADMIN can reach them)
+    @Column(updatable = false)
+    private UUID ownerId;
+
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -37,9 +41,10 @@ class FileMetadata {
     @Column(nullable = false, updatable = false)
     private Instant uploadedAt;
 
-    FileMetadata(String name, String contentType, long size) {
+    FileMetadata(String name, String contentType, long size, UUID ownerId) {
         this.name = name;
         this.contentType = contentType;
         this.size = size;
+        this.ownerId = ownerId;
     }
 }
