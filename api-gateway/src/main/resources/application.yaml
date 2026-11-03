@@ -17,6 +17,10 @@ spring:
               uri: http://localhost:8082
               predicates:
                 - Path=/api/v1/files/**
+            - id: user-service
+              uri: http://localhost:8086
+              predicates:
+                - Path=/api/v1/users/**
 
 management:
   endpoints:
