@@ -1,5 +1,7 @@
 package com.marcos.aiservice.chat;
 
+import com.marcos.aiservice.SecurityConfig;
+import org.springframework.context.annotation.Import;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -9,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 import reactor.core.publisher.Flux;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -16,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ChatController.class)
+@Import(SecurityConfig.class)
 class ChatControllerTest {
 
     @Autowired
@@ -30,7 +34,7 @@ class ChatControllerTest {
     void chatReturnsModelAnswer() throws Exception {
         given(chatService.ask("hola", "1", userId)).willReturn("buenas");
 
-        mockMvc.perform(post("/chat/{userId}", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        mockMvc.perform(post("/chat/{userId}", userId).with(jwt()).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("buenas"));
     }
@@ -39,7 +43,7 @@ class ChatControllerTest {
     void streamEmitsEachChunkAsSse() throws Exception {
         given(chatService.stream("hola", "1", userId)).willReturn(Flux.just("Hola", " mundo"));
 
-        var started = mockMvc.perform(post("/chat/{userId}/stream", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+        var started = mockMvc.perform(post("/chat/{userId}/stream", userId).with(jwt()).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
                 .andExpect(request().asyncStarted())
                 .andReturn();
 
@@ -47,5 +51,11 @@ class ChatControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM))
                 .andExpect(content().string("data: Hola\n\ndata:  mundo\n\n"));
+    }
+
+    @Test
+    void chatWithoutTokenIsUnauthorized() throws Exception {
+        mockMvc.perform(post("/chat/{userId}", userId).param("conversationId", "1").contentType(MediaType.TEXT_PLAIN).content("hola"))
+                .andExpect(status().isUnauthorized());
     }
 }

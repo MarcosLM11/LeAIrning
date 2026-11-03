@@ -15,6 +15,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
@@ -25,27 +26,45 @@ class UserControllerTest {
 
     @Test
     void crudFlow() throws Exception {
-        var email = UUID.randomUUID() + "@test.com";
+        var username = "u" + UUID.randomUUID();
+        var email = username + "@test.com";
         var body = mvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"" + email + "\",\"name\":\"Ana\"}"))
+                        .content("{\"email\":\"" + email + "\",\"name\":\"Ana\",\"username\":\"" + username
+                                + "\",\"password\":\"password1\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(email))
+                .andExpect(jsonPath("$.password").doesNotExist())
                 .andReturn().getResponse().getContentAsString();
         String id = JsonPath.read(body, "$.id");
 
-        mvc.perform(get("/api/v1/users/" + id)).andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Ana"));
+        mvc.perform(get("/api/v1/users/" + id)).andExpect(status().isUnauthorized());
+        mvc.perform(login(username, "wrong-pass")).andExpect(status().isUnauthorized());
 
-        mvc.perform(put("/api/v1/users/" + id).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Bea\"}"))
+        mvc.perform(login(email, "password1")).andExpect(status().isOk());
+        var token = "Bearer " + JsonPath.read(
+                mvc.perform(login(username, "password1")).andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsString(), "$.accessToken");
+
+        mvc.perform(get("/api/v1/users/" + id).header("Authorization", token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Ana"));
+
+        mvc.perform(put("/api/v1/users/" + id).header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Bea\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Bea"));
 
-        mvc.perform(delete("/api/v1/users/" + id)).andExpect(status().isNoContent());
-        mvc.perform(get("/api/v1/users/" + id)).andExpect(status().isNotFound());
+        mvc.perform(delete("/api/v1/users/" + id).header("Authorization", token)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/v1/users/" + id).header("Authorization", token)).andExpect(status().isNotFound());
+    }
+
+    private static MockHttpServletRequestBuilder login(String identifier, String password) {
+        return post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"identifier\":\"" + identifier + "\",\"password\":\"" + password + "\"}");
     }
 
     @Test
     void invalidEmailIsBadRequest() throws Exception {
         mvc.perform(post("/api/v1/users").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\":\"nope\",\"name\":\"Ana\"}"))
+                        .content("{\"email\":\"nope\",\"name\":\"Ana\",\"username\":\"ana\",\"password\":\"password1\"}"))
                 .andExpect(status().isBadRequest());
     }
 }

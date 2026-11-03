@@ -31,3 +31,6 @@ s3:
   access-key: rustfsadmin
   secret-key: rustfsadmin
   bucket: files
+
+jwt:
+  secret: ${JWT_SECRET:dev-only-secret-change-me-in-prod-32b}

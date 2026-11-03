@@ -1,4 +1,4 @@
-package com.marcos.userservice;
+package com.marcos.userservice.user;
 
 import java.util.List;
 import java.util.UUID;

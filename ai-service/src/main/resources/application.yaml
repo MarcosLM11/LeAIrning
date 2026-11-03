@@ -53,3 +53,6 @@ quizz:
 logging:
   level:
     org.springframework.ai.chat.client.advisor: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:dev-only-secret-change-me-in-prod-32b}

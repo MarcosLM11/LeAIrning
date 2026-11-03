@@ -1,9 +1,10 @@
-package com.marcos.userservice;
+package com.marcos.userservice.user;
 
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,12 +14,17 @@ import org.springframework.web.server.ResponseStatusException;
 class UserService {
 
     private final UserRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     UserResponse create(CreateUserRequest r) {
         if (repository.existsByEmail(r.email())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
         }
-        return UserResponse.from(repository.save(new User(r.email(), r.name())));
+        if (repository.existsByUsername(r.username())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
+        }
+        return UserResponse.from(repository.save(
+                new User(r.email(), r.name(), r.username(), passwordEncoder.encode(r.password()))));
     }
 
     UserResponse get(UUID id) {
