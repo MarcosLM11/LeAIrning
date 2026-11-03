@@ -33,9 +33,9 @@ class QuizzServiceTest {
 
     @Test
     void startRejectsOutOfRangeParams() {
-        assertThatThrownBy(() -> service.start(userId, fileId, 0, 4, Difficulty.MEDIO))
+        assertThatThrownBy(() -> service.start(userId, "a@a.com", fileId, 0, 4, Difficulty.MEDIO))
                 .hasMessageContaining("400");
-        assertThatThrownBy(() -> service.start(userId, fileId, 10, 7, Difficulty.MEDIO))
+        assertThatThrownBy(() -> service.start(userId, "a@a.com", fileId, 10, 7, Difficulty.MEDIO))
                 .hasMessageContaining("400");
     }
 
@@ -47,11 +47,11 @@ class QuizzServiceTest {
             return saved;
         });
 
-        var result = service.start(userId, fileId, 5, 3, Difficulty.FACIL);
+        var result = service.start(userId, "a@a.com", fileId, 5, 3, Difficulty.FACIL);
 
         assertThat(result).isEqualTo(id);
         verify(kafka).send(QuizzService.TOPIC, id.toString(),
-                new QuizzRequestedEvent(id, userId, fileId, 5, 3, Difficulty.FACIL));
+                new QuizzRequestedEvent(id, userId, "a@a.com", fileId, 5, 3, Difficulty.FACIL));
     }
 
     @Test

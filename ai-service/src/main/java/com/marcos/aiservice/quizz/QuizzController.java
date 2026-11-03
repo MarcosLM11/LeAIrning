@@ -3,6 +3,8 @@ package com.marcos.aiservice.quizz;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +25,8 @@ public class QuizzController {
                       @RequestParam(defaultValue = "10") int questions,
                       @RequestParam(defaultValue = "4") int options,
                       @RequestParam(defaultValue = "MEDIO") Difficulty difficulty,
-                      Authentication auth) {
-        return quizzService.start(userId(auth), fileId, questions, options, difficulty);
+                      @AuthenticationPrincipal Jwt jwt) {
+        return quizzService.start(UUID.fromString(jwt.getSubject()), jwt.getClaimAsString("email"), fileId, questions, options, difficulty);
     }
 
     @GetMapping("/quizz/{id}")

@@ -17,12 +17,12 @@ public class QuizzService {
     private final QuizzRepository repository;
     private final KafkaTemplate<String, QuizzRequestedEvent> kafka;
 
-    public UUID start(UUID userId, UUID fileId, int questions, int options, Difficulty difficulty) {
+    public UUID start(UUID userId, String email, UUID fileId, int questions, int options, Difficulty difficulty) {
         if (questions < 1 || questions > 50 || options < 2 || options > 6) {
             throw new ResponseStatusException(BAD_REQUEST, "questions must be 1-50 and options 2-6");
         }
         var id = repository.save(new Quizz(fileId, userId)).getId();
-        kafka.send(TOPIC, id.toString(), new QuizzRequestedEvent(id, userId, fileId, questions, options, difficulty));
+        kafka.send(TOPIC, id.toString(), new QuizzRequestedEvent(id, userId, email, fileId, questions, options, difficulty));
         return id;
     }
 
