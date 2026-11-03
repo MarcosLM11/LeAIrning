@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { login, logout, refresh } from './api'
+import { login, logout, refresh, setToken as storeToken } from './api'
+import Files from './Files'
 
 export default function App() {
   const [token, setToken] = useState<string | null>(null)
@@ -28,14 +29,16 @@ export default function App() {
     setToken(null)
   }
 
+  storeToken(token)
+
   if (loading) return null
 
   if (token) {
     return (
       <>
         <h1>LeAIrning</h1>
-        <p>Sesión iniciada.</p>
         <button onClick={onLogout}>Salir</button>
+        <Files />
       </>
     )
   }

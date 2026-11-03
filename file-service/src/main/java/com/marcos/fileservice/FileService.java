@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 import com.marcos.fileservice.storage.S3Service;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileService {
@@ -24,17 +24,18 @@ public class FileService {
         this.kafka = kafka;
     }
 
-    UUID upload(HttpServletRequest request, String name, UUID ownerId) {
+    UUID upload(MultipartFile upload, UUID ownerId) {
         //validate length > 0, virus scan, tipo válido
-        var length = request.getContentLengthLong();
-        var contentType = request.getContentType() != null
-                ? request.getContentType()
+        var length = upload.getSize();
+        var contentType = upload.getContentType() != null
+                ? upload.getContentType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        var file = repository.save(new FileMetadata(name != null ? name : "unnamed", contentType, length, ownerId));
+        var name = upload.getOriginalFilename() != null ? upload.getOriginalFilename() : "unnamed";
+        var file = repository.save(new FileMetadata(name, contentType, length, ownerId));
         var key = file.getId();
 
         try {
-            s3.upload(key.toString(), request.getInputStream(), length, contentType);
+            s3.upload(key.toString(), upload.getInputStream(), length, contentType);
         } catch (IOException e) {
             markFailed(file);
             throw new RuntimeException(e);

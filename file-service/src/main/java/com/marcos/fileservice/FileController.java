@@ -2,7 +2,6 @@ package com.marcos.fileservice;
 
 import java.util.List;
 import java.util.UUID;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("api/v1/files")
@@ -28,9 +28,8 @@ class FileController {
     }
 
     @PostMapping
-    ResponseEntity<String> upload(HttpServletRequest request, @RequestParam(required = false) String name,
-                                  Authentication auth) {
-        var key = service.upload(request, name, userId(auth));
+    ResponseEntity<String> upload(@RequestParam("file") MultipartFile file, Authentication auth) {
+        var key = service.upload(file, userId(auth));
         return ResponseEntity.ok("uploaded file: " + key);
     }
 

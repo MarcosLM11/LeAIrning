@@ -8,15 +8,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.io.ByteArrayInputStream;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,9 +37,9 @@ class FileControllerTest {
 
     @Test
     void returnsKeyOfUploadedFile() throws Exception {
-        when(service.upload(any(HttpServletRequest.class), any(), eq(USER))).thenReturn(ID);
+        when(service.upload(any(MultipartFile.class), eq(USER))).thenReturn(ID);
 
-        mvc.perform(post("/api/v1/files").principal(AUTH).contentType("text/plain").content("hey"))
+        mvc.perform(multipart("/api/v1/files").file(new MockMultipartFile("file", "a.txt", "text/plain", "hey".getBytes())).principal(AUTH))
                 .andExpect(status().isOk())
                 .andExpect(content().string("uploaded file: " + ID));
     }
