@@ -1,0 +1,23 @@
+name: api-gateway CI
+
+on:
+  push:
+    paths: [api-gateway/**, .github/workflows/api-gateway.yml]
+  pull_request:
+    paths: [api-gateway/**, .github/workflows/api-gateway.yml]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: liberica
+          java-version: 27
+          cache: maven
+          cache-dependency-path: api-gateway/pom.xml
+      - run: ./mvnw -B verify
