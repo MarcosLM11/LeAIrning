@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisar quizzes</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1b1b1f; --muted: #62626f; --card: #f4f4f8; --border: #d9d9e2;
+    --ok: #146c3e; --ok-bg: #e0f4e8; --warn: #8a5300; --warn-bg: #fdf0d8; --bad: #a3231b; --bad-bg: #fde4e1;
+    --accent: #3b4fd8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15151a; --fg: #ececf2; --muted: #9a9aaa; --card: #1f1f27; --border: #34343f;
+      --ok: #6fdc9b; --ok-bg: #143323; --warn: #f2b755; --warn-bg: #36280f; --bad: #ff9088; --bad-bg: #3a1815;
+      --accent: #8c9bff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+  h1 { font-size: 1.1rem; margin: 0; width: 100%; }
+  label { display: flex; flex-direction: column; font-size: .8rem; color: var(--muted); gap: 4px; flex: 1 1 320px; }
+  input { font: inherit; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--fg); }
+  button { font: inherit; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--fg); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  main { display: grid; grid-template-columns: 300px 1fr; gap: 16px; padding: 16px; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+  #list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  #list button { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 4px; }
+  #list button[aria-current="true"] { border-color: var(--accent); border-width: 2px; }
+  .meta { font-size: .8rem; color: var(--muted); overflow-wrap: anywhere; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .READY { background: var(--ok-bg); color: var(--ok); }
+  .PENDING { background: var(--warn-bg); color: var(--warn); }
+  .FAILED { background: var(--bad-bg); color: var(--bad); }
+  .question { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 0 0 12px; list-style: none; }
+  .question h3 { margin: 0 0 8px; font-size: 1rem; }
+  .options { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .options li { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; }
+  .options li.correct { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); font-weight: 600; }
+  .explanation { margin: 10px 0 0; font-size: .9rem; color: var(--muted); }
+  #detail ol { margin: 0; padding: 0; }
+  .empty { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Revisar quizzes</h1>
+  <label>userId
+    <input id="user" placeholder="11111111-1111-1111-1111-111111111111" autocomplete="off">
+  </label>
+  <button id="load" type="button">Cargar quizzes</button>
+</header>
+<main>
+  <section aria-label="Quizzes">
+    <ul id="list"><li class="empty">Introduce un userId y pulsa «Cargar quizzes».</li></ul>
+  </section>
+  <section id="detail" aria-live="polite" aria-label="Detalle del quizz"></section>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const user = $('user');
+  try { user.value = localStorage.getItem('userId') || ''; } catch (e) {}
+
+  // Quizz text comes from the model, so everything is built with textContent, never innerHTML.
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  async function api(path) {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(response.status + ' ' + response.statusText);
+    return response.json();
+  }
+
+  function badge(status) { return el('span', 'badge ' + status, status); }
+
+  async function loadList() {
+    const userId = user.value.trim();
+    try { localStorage.setItem('userId', userId); } catch (e) {}
+    const list = $('list');
+    list.replaceChildren();
+    try {
+      const quizzes = await api('/quizz/' + encodeURIComponent(userId));
+      if (!quizzes.length) list.append(el('li', 'empty', 'Este usuario no tiene quizzes.'));
+      quizzes.forEach((quizz) => {
+        const button = el('button');
+        button.type = 'button';
+        const top = el('span');
+        top.append(badge(quizz.status), ' ', el('strong', '', quizz.strategy));
+        button.append(top,
+          el('span', 'meta', new Date(quizz.createdAt).toLocaleString()),
+          el('span', 'meta', 'file ' + quizz.fileId));
+        button.addEventListener('click', () => showQuizz(userId, quizz.id, button));
+        const item = el('li');
+        item.append(button);
+        list.append(item);
+      });
+    } catch (e) {
+      list.append(el('li', 'empty', 'Error: ' + e.message + ' (¿perfil dev activo?)'));
+    }
+  }
+
+  async function showQuizz(userId, id, button) {
+    document.querySelectorAll('#list button').forEach((b) => b.removeAttribute('aria-current'));
+    button.setAttribute('aria-current', 'true');
+    const detail = $('detail');
+    detail.replaceChildren();
+    try {
+      const review = await api('/quizz/' + encodeURIComponent(userId) + '/' + id + '/review');
+      const head = el('p');
+      head.append(badge(review.summary.status), ' ',
+        el('strong', '', review.summary.strategy), ' · ' + review.questions.length + ' preguntas ');
+      const refresh = el('button', '', 'Actualizar');
+      refresh.type = 'button';
+      refresh.addEventListener('click', () => showQuizz(userId, id, button));
+      head.append(refresh);
+      detail.append(head);
+      if (!review.questions.length) {
+        detail.append(el('p', 'empty', 'Sin preguntas todavía (estado ' + review.summary.status + ').'));
+        return;
+      }
+      const ol = el('ol');
+      review.questions.forEach((q, i) => {
+        const card = el('li', 'question');
+        card.append(el('h3', '', (i + 1) + '. ' + q.text));
+        const options = el('ul', 'options');
+        q.options.forEach((option, j) => {
+          const correct = j === q.correctIndex;
+          options.append(el('li', correct ? 'correct' : '',
+            String.fromCharCode(65 + j) + ') ' + option + (correct ? '  ✓ correcta' : '')));
+        });
+        card.append(options);
+        if (q.explanation) card.append(el('p', 'explanation', q.explanation));
+        ol.append(card);
+      });
+      detail.append(ol);
+    } catch (e) {
+      detail.append(el('p', 'empty', 'Error: ' + e.message));
+    }
+  }
+
+  $('load').addEventListener('click', loadList);
+  user.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadList(); });
+  if (user.value) loadList();
+</script>
+</body>
+</html>

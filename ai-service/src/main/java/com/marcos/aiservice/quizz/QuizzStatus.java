@@ -1,6 +1,6 @@
 package com.marcos.aiservice.quizz;
 
-enum QuizzStatus {
+public enum QuizzStatus {
     PENDING,
     READY,
     FAILED

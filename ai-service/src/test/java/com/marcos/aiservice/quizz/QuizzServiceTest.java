@@ -3,84 +3,83 @@ package com.marcos.aiservice.quizz;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class QuizzServiceTest {
 
-    private final ChatClient chatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
-    private final JdbcClient jdbc = mock(JdbcClient.class, Answers.RETURNS_DEEP_STUBS);
-    private final QuizzService service = new QuizzService(chatClient, jdbc);
+    private final QuizzRepository repository = mock(QuizzRepository.class);
+    @SuppressWarnings("unchecked")
+    private final KafkaTemplate<String, QuizzRequestedEvent> kafka = mock(KafkaTemplate.class);
+    private final QuizzService service = new QuizzService(repository, kafka);
+    private final UUID userId = UUID.randomUUID();
     private final UUID fileId = UUID.randomUUID();
+    private final UUID id = UUID.randomUUID();
+
+    private Quizz pendingQuizz() {
+        var quizz = new Quizz(fileId, userId, Strategy.MAP);
+        ReflectionTestUtils.setField(quizz, "id", id);
+        when(repository.findById(id)).thenReturn(Optional.of(quizz));
+        return quizz;
+    }
 
     @Test
-    void rejectsOutOfRangeParams() {
-        assertThatThrownBy(() -> service.generate(fileId, Strategy.MAP, 0, 4, Difficulty.MEDIO))
+    void startRejectsOutOfRangeParams() {
+        assertThatThrownBy(() -> service.start(userId, fileId, Strategy.MAP, 0, 4, Difficulty.MEDIO))
                 .hasMessageContaining("400");
-        assertThatThrownBy(() -> service.generate(fileId, Strategy.MAP, 10, 7, Difficulty.MEDIO))
+        assertThatThrownBy(() -> service.start(userId, fileId, Strategy.MAP, 10, 7, Difficulty.MEDIO))
                 .hasMessageContaining("400");
     }
 
     @Test
-    void unknownFileIs404() {
-        when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of());
+    void startSavesPendingQuizzAndSendsEvent() {
+        when(repository.save(any(Quizz.class))).thenAnswer(call -> {
+            var saved = call.<Quizz>getArgument(0);
+            ReflectionTestUtils.setField(saved, "id", id);
+            return saved;
+        });
 
-        assertThatThrownBy(() -> service.generate(fileId, Strategy.MAP, 10, 4, Difficulty.MEDIO))
-                .hasMessageContaining("404");
+        var result = service.start(userId, fileId, Strategy.CONCEPTS, 5, 3, Difficulty.FACIL);
+
+        assertThat(result).isEqualTo(id);
+        verify(kafka).send(QuizzService.TOPIC, id.toString(),
+                new QuizzRequestedEvent(id, fileId, Strategy.CONCEPTS, 5, 3, Difficulty.FACIL));
     }
 
     @Test
-    void failsWith502WhenModelReturnsNoValidQuestions() {
-        when(jdbc.sql(anyString()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of("texto"));
-        when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(GeneratedQuizz.class), any(Consumer.class)))
-                .thenReturn(new GeneratedQuizz(List.of(new GeneratedQuestion("q", List.of("a"), 5, "e"))));
+    void getHidesQuizzOfAnotherUser() {
+        pendingQuizz();
 
-        assertThatThrownBy(() -> service.generate(fileId, Strategy.FULL, 10, 4, Difficulty.MEDIO))
-                .hasMessageContaining("502");
+        assertThatThrownBy(() -> service.get(UUID.randomUUID(), id)).hasMessageContaining("404");
     }
 
     @Test
-    void shareSumsToTotalAndEverySectionGetsOne() {
-        var shares = IntStream.range(0, 7).map(i -> QuizzService.share(10, 7, i)).toArray();
+    void completeStoresQuestionsAndMarksReady() {
+        var quizz = pendingQuizz();
 
-        assertThat(IntStream.of(shares).sum()).isEqualTo(10);
-        assertThat(IntStream.of(shares).min().getAsInt()).isGreaterThanOrEqualTo(1);
+        service.complete(id, new GeneratedQuizz(List.of(new GeneratedQuestion("q?", List.of("a", "b"), 1, "e"))));
+
+        assertThat(quizz.getStatus()).isEqualTo(QuizzStatus.READY);
+        assertThat(quizz.getQuestions()).extracting(Question::getText).containsExactly("q?");
     }
 
     @Test
-    void onlyValidDropsBadQuestions() {
-        var good = new GeneratedQuestion("q", List.of("a", "b", "c"), 2, "e");
-        var badIndex = new GeneratedQuestion("q", List.of("a", "b", "c"), 3, "e");
-        var badSize = new GeneratedQuestion("q", List.of("a", "b"), 0, "e");
+    void failMarksFailedButNeverOverwritesAFinishedQuizz() {
+        var quizz = pendingQuizz();
+        service.fail(id);
+        assertThat(quizz.getStatus()).isEqualTo(QuizzStatus.FAILED);
 
-        assertThat(QuizzService.onlyValid(List.of(good, badIndex, badSize), 3)).containsExactly(good);
-    }
+        service.complete(id, new GeneratedQuizz(List.of(new GeneratedQuestion("q?", List.of("a", "b"), 1, "e"))));
 
-    @Test
-    void sectionsKeepEverythingWhenUnderLimit() {
-        var chunks = IntStream.range(0, 45).mapToObj(i -> "c" + i).toList();
-
-        assertThat(QuizzService.sections(chunks, 10)).hasSize(3);
-    }
-
-    @Test
-    void sectionsAreEvenlySpacedWhenOverLimit() {
-        var chunks = IntStream.range(0, 400).mapToObj(i -> "c" + i).toList(); // 20 sections
-
-        var sections = QuizzService.sections(chunks, 4);
-
-        assertThat(sections).hasSize(4);
-        assertThat(sections.get(0)).startsWith("c0\n");
-        assertThat(sections.get(3)).startsWith("c300\n"); // sections 0, 5, 10, 15
+        assertThat(quizz.getStatus()).isEqualTo(QuizzStatus.FAILED);
+        assertThat(quizz.getQuestions()).isEmpty();
     }
 }

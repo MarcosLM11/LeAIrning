@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: ai-service
+  profiles:
+    active: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
@@ -12,6 +14,20 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+  kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: ai-service
+      auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.value.default.type: com.marcos.aiservice.quizz.QuizzRequestedEvent
+        spring.json.use.type.headers: false
+        # shortcut: a quizz can take minutes to generate, so allow 30 min between polls; use a real job queue if it needs more.
+        max.poll.interval.ms: 1800000
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
@@ -29,6 +45,10 @@ spring:
       repository:
         jdbc:
           initialize-schema: always
+
+quizz:
+  model: gpt-5-mini
+  reasoning-effort: low
 
 logging:
   level:
