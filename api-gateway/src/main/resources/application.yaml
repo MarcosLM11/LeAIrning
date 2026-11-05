@@ -12,7 +12,7 @@ spring:
             - id: ai-service
               uri: http://localhost:8081
               predicates:
-                - Path=/chat/**, /quizz/**
+                - Path=/api/v1/chat/**, /api/v1/quizz/**
             - id: file-service
               uri: http://localhost:8082
               predicates:
