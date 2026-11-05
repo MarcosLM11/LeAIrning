@@ -1,4 +1,4 @@
-import { Component, ElementRef, afterNextRender, inject, output, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, afterNextRender, inject, input, output, signal, viewChild } from '@angular/core';
 import { DocumentsService } from '../documents/documents.service';
 import { DIFFICULTIES, Difficulty, QuizzParams } from './quizzes.service';
 
@@ -23,8 +23,8 @@ const ICON = 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-l
       <div class="space-y-4 px-6 pb-2">
         <label class="block text-[13px] font-medium">
           Documento
-          <select class="input select mt-1.5 font-normal" [value]="fileId()" (change)="fileId.set($any($event.target).value)">
-            @for (d of docs(); track d.id) { <option [value]="d.id">{{ d.name }}</option> }
+          <select class="input select mt-1.5 font-normal" (change)="fileId.set($any($event.target).value)">
+            @for (d of docs(); track d.id) { <option [value]="d.id" [selected]="d.id === fileId()">{{ d.name }}</option> }
           </select>
         </label>
 
@@ -81,6 +81,7 @@ export class QuizzModal {
 
   docs = signal<{ id: string; name: string }[]>([]);
   difficulties = DIFFICULTIES;
+  preselected = input('');
   fileId = signal('');
   difficulty = signal<Difficulty>('MEDIO');
   questions = signal(10);
@@ -93,7 +94,7 @@ export class QuizzModal {
   constructor() {
     inject(DocumentsService).list().subscribe((l) => {
       this.docs.set(l.filter((d) => d.status === 'READY'));
-      this.fileId.set(this.docs()[0]?.id ?? '');
+      this.fileId.set(this.docs().find((d) => d.id === this.preselected())?.id ?? this.docs()[0]?.id ?? '');
     });
     afterNextRender(() => this.dlg().nativeElement.showModal());
   }

@@ -33,7 +33,7 @@ import { typeOf } from './file-type';
         </span>
         <div class="flex gap-4 text-[13px] font-medium" [class]="ready() ? 'text-brand' : 'pointer-events-none text-mute/40'" (click)="$event.stopPropagation()">
           <a routerLink="/chat" [queryParams]="{ doc: doc().id }">Chat</a>
-          <a routerLink="/quizzes">Cuestionario</a>
+          <a routerLink="/quizzes" [queryParams]="{ doc: doc().id }">Cuestionario</a>
         </div>
       </div>
     </article>

@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { fmtDate } from '../documents/doc-format';
 import { DocumentsService } from '../documents/documents.service';
 import { QuizzModal } from './quizz-modal';
@@ -61,7 +62,7 @@ const BADGE: Record<QuizzStatus, { label: string; cls: string }> = {
     @if (play(); as q) {
       <app-quizz-play [id]="q.id" [doc]="name(q)" [difficulty]="label[q.difficulty]" (closed)="play.set(null)" (finished)="load()" />
     }
-    @if (modal()) { <app-quizz-modal (closed)="modal.set(false)" (generate)="generate($event)" /> }
+    @if (modal()) { <app-quizz-modal [preselected]="doc" (closed)="modal.set(false); doc = ''" (generate)="generate($event)" /> }
   `,
 })
 
@@ -71,7 +72,8 @@ export class Quizzes {
   badge = BADGE;
   label = LABEL;
   fmtDate = fmtDate;
-  modal = signal(false);
+  doc = inject(ActivatedRoute).snapshot.queryParamMap.get('doc') ?? '';
+  modal = signal(!!this.doc);
   error = signal('');
   play = signal<QuizzSummary | null>(null);
   quizzes = signal<QuizzSummary[]>([]);
