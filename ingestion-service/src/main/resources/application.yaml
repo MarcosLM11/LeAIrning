@@ -5,6 +5,10 @@ spring:
   application:
     name: ingestion-service
   kafka:
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
     consumer:
       group-id: ingestion-service
       auto-offset-reset: earliest

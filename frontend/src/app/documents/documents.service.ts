@@ -7,7 +7,7 @@ export interface Doc {
   name: string;
   contentType: string;
   size: number;
-  status: 'UPLOADING' | 'UPLOADED' | 'FAILED';
+  status: 'UPLOADING' | 'UPLOADED' | 'READY' | 'FAILED';
   uploadedAt: string;
 }
 

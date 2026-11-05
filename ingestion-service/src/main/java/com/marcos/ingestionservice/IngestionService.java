@@ -21,11 +21,12 @@ class IngestionService {
         this.loader = loader;
     }
 
-    void ingest(FileUploadedEvent event) throws IOException {
+    /** @return false when the file type is unsupported (nothing was indexed). */
+    boolean ingest(FileUploadedEvent event) throws IOException {
         var type = FileType.of(event);
         if (type == null) {
             log.warn("Unsupported file {} ({}), skipping", event.fileId(), event.contentType());
-            return;
+            return false;
         }
         try (var in = s3.open(event.fileId().toString())) {
             var docs = extractor.extract(type, in, event);
@@ -37,6 +38,7 @@ class IngestionService {
 
             loader.load(event, chunks);
             log.info("Ingested {}: {} documents -> {} chunks", event.name(), docs.size(), chunks.size());
+            return true;
         }
     }
 }

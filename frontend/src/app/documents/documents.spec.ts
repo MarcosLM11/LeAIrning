@@ -4,7 +4,7 @@ import { Documents } from './documents';
 import { DocumentsService } from './documents.service';
 
 const doc = (name: string, ago: number) => ({
-  id: name, name, size: 1, status: 'UPLOADED' as const, uploadedAt: new Date(Date.now() - ago * 86_400_000).toISOString(),
+  id: name, name, size: 1, status: 'READY' as const, uploadedAt: new Date(Date.now() - ago * 86_400_000).toISOString(),
 });
 
 describe('Documents filters', () => {

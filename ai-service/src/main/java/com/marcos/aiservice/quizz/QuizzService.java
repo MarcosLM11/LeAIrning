@@ -34,6 +34,11 @@ public class QuizzService {
     }
 
     @Transactional
+    public void deleteByFile(UUID fileId) {
+        repository.deleteByFileId(fileId);
+    }
+
+    @Transactional
     public void complete(UUID id, GeneratedQuizz generated) {
         repository.findById(id).filter(quizz -> quizz.getStatus() == QuizzStatus.PENDING).ifPresent(quizz -> {
             quizz.setQuestions(generated.questions());

@@ -15,10 +15,11 @@ public class FileService {
 
     private final S3Service s3;
     private final FileMetadataRepository repository;
-    private final KafkaTemplate<String, FileUploadedEvent> kafka;
+    private final KafkaTemplate<String, Object> kafka;
     static final String FILE_UPLOADED_TOPIC = "file.uploaded";
+    static final String FILE_DELETED_TOPIC = "file.deleted";
 
-    FileService(S3Service s3, FileMetadataRepository repository, KafkaTemplate<String, FileUploadedEvent> kafka) {
+    FileService(S3Service s3, FileMetadataRepository repository, KafkaTemplate<String, Object> kafka) {
         this.s3 = s3;
         this.repository = repository;
         this.kafka = kafka;
@@ -82,5 +83,14 @@ public class FileService {
     void delete(UUID key) {
         s3.delete(key.toString());
         repository.deleteById(key);
+        kafka.send(FILE_DELETED_TOPIC, key.toString(), new FileDeletedEvent(key));
+    }
+
+    // UPLOADED -> READY once ingestion has indexed the file, FAILED otherwise. Ignored if the file was deleted meanwhile.
+    void markIngested(UUID key, boolean success) {
+        repository.findById(key).ifPresent(f -> {
+            f.setStatus(success ? FileStatus.READY : FileStatus.FAILED);
+            repository.save(f);
+        });
     }
 }

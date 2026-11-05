@@ -1,6 +1,7 @@
 package com.marcos.ingestionservice;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,11 @@ class DocumentLoader {
 
     void load(FileUploadedEvent event, List<Document> chunks) {
         // Kafka is at-least-once: drop previous chunks so a redelivery doesn't duplicate them.
-        vectorStore.delete("fileId == '" + event.fileId() + "'");
+        delete(event.fileId());
         vectorStore.add(chunks);
+    }
+
+    void delete(UUID fileId) {
+        vectorStore.delete("fileId == '" + fileId + "'");
     }
 }
