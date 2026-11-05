@@ -11,6 +11,7 @@ export const routes: Routes = [
       { path: 'documents', loadComponent: () => import('./documents/documents').then((m) => m.Documents) },
       { path: 'chat', loadComponent: () => import('./chat/chat').then((m) => m.Chat) },
       { path: 'quizzes', loadComponent: () => import('./quizzes/quizzes').then((m) => m.Quizzes) },
+      { path: 'profile', loadComponent: () => import('./user/profile').then((m) => m.Profile) },
     ],
   },
   {

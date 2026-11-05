@@ -44,10 +44,10 @@ const NAV = [
           </nav>
         </div>
         <div class="flex items-center gap-3 pb-5" [class]="collapsed() ? 'flex-col' : 'justify-between px-5'">
-          <div class="flex items-center gap-2.5">
+          <a routerLink="/profile" routerLinkActive="bg-app" title="Perfil" class="-m-1 flex items-center gap-2.5 rounded-[10px] p-1 hover:bg-app">
             <span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">{{ me()?.name?.charAt(0)?.toUpperCase() }}</span>
             @if (!collapsed()) { <span class="text-[13px] font-medium">{{ me()?.name }}</span> }
-          </div>
+          </a>
           <app-theme-toggle />
         </div>
       </aside>
