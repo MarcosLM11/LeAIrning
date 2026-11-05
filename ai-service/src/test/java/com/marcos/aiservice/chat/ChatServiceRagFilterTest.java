@@ -56,7 +56,7 @@ class ChatServiceRagFilterTest {
                         .build())
                 .build();
 
-        new ChatService(client, mock(SessionService.class)).ask("hola", "1", userId, fileIds);
+        new ChatService(client, mock(SessionService.class), mock(AnswerSourceRepository.class)).ask("hola", "1", userId, fileIds);
 
         var request = ArgumentCaptor.forClass(SearchRequest.class);
         verify(vectorStore).similaritySearch(request.capture());

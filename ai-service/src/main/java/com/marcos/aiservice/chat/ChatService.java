@@ -1,5 +1,6 @@
 package com.marcos.aiservice.chat;
 
+import static java.util.stream.Collectors.groupingBy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.session.SessionService;
@@ -26,6 +27,7 @@ public class ChatService {
 
     private final ChatClient chatClient;
     private final SessionService sessionService;
+    private final AnswerSourceRepository answerSources;
 
     public String ask(String question, String conversationId, UUID userId, List<UUID> fileIds) {
         return prompt(question, conversationId, userId, fileIds)
@@ -85,13 +87,20 @@ public class ChatService {
     }
 
     public List<MessageView> history(String conversationId, UUID userId) {
-        return sessionService.getEvents(sessionId(userId, conversationId), EventFilter.active()).stream()
+        var events = sessionService.getEvents(sessionId(userId, conversationId), EventFilter.active()).stream()
                 .filter(e -> !e.getMetadata().containsKey(SessionEvent.METADATA_SYNTHETIC))
-                .map(e -> new MessageView(e.getMessage().getMessageType().name().toLowerCase(), e.getMessage().getText(), e.getTimestamp()))
+                .toList();
+
+        var sources = answerSources.findByEventIdInOrderByFilenameAscPageAsc(events.stream().map(SessionEvent::getId).toList()).stream()
+                .collect(groupingBy(AnswerSource::getEventId));
+
+        return events.stream()
+                .map(e -> new MessageView(e.getMessage().getMessageType().name().toLowerCase(), e.getMessage().getText(), e.getTimestamp(), sources.getOrDefault(e.getId(), List.of()).stream().map(MessageView.Source::of).toList()))
                 .toList();
     }
 
     public void clearHistory(String conversationId, UUID userId) {
         sessionService.delete(sessionId(userId, conversationId));
+        answerSources.deleteBySessionId(sessionId(userId, conversationId));
     }
 }

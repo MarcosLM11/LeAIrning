@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 class ChatServiceTest {
     private final ChatClient chatClient = mock(ChatClient.class, Answers.RETURNS_DEEP_STUBS);
     private final SessionService sessions = mock(SessionService.class);
-    private final ChatService service = new ChatService(chatClient, sessions);
+    private final AnswerSourceRepository answerSources = mock(AnswerSourceRepository.class);
+    private final ChatService service = new ChatService(chatClient, sessions, answerSources);
     private final UUID userId = UUID.randomUUID();
 
     @Test
@@ -63,6 +64,21 @@ class ChatServiceTest {
     }
 
     @Test
+    void historyAttachesSourcesToTheAnswerTheyBelongTo() {
+        var question = SessionEvent.builder().sessionId(userId + ":1").message(new UserMessage("¿qué es Kafka?")).build();
+        var answer = SessionEvent.builder().sessionId(userId + ":1").message(new AssistantMessage("Un log distribuido")).build();
+        var fileId = UUID.randomUUID();
+        when(sessions.getEvents(eq(userId + ":1"), any(EventFilter.class))).thenReturn(List.of(question, answer));
+        when(answerSources.findByEventIdInOrderByFilenameAscPageAsc(List.of(question.getId(), answer.getId())))
+                .thenReturn(List.of(new AnswerSource(answer.getId(), userId + ":1", fileId, "kafka.pdf", 12)));
+
+        var history = service.history("1", userId);
+
+        assertThat(history.get(0).sources()).isEmpty();
+        assertThat(history.get(1).sources()).containsExactly(new MessageView.Source("kafka.pdf", 12));
+    }
+
+    @Test
     void conversationsListOnlyTheUsersChatsNewestFirstWithoutThePrefix() {
         var old = Session.builder().id(userId + ":a").userId(userId.toString()).createdAt(Instant.parse("2026-11-01T10:00:00Z")).metadata(Map.of("title", "viejo")).build();
         var recent = Session.builder().id(userId + ":b").userId(userId.toString()).createdAt(Instant.parse("2026-11-02T10:00:00Z")).metadata(Map.of("title", "nuevo")).build();
@@ -91,6 +107,8 @@ class ChatServiceTest {
 
         service.clearHistory("1", other);
         verify(sessions).delete(other + ":1");
+        verify(answerSources).deleteBySessionId(other + ":1");
+        verify(answerSources, never()).deleteBySessionId(userId + ":1");
         verify(sessions, never()).delete(userId + ":1");
     }
 }

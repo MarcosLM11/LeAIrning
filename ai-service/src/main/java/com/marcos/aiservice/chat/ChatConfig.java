@@ -16,8 +16,9 @@ import org.springframework.context.annotation.Configuration;
 public class ChatConfig {
 
     @Bean
-    SessionMemoryAdvisor sessionMemoryAdvisor(SessionService sessionService) {
+    SessionMemoryAdvisor sessionMemoryAdvisor(SessionService sessionService, SourceRecorder sourceRecorder) {
         return SessionMemoryAdvisor.builder(sessionService)
+                .responseEventIdGenerator(sourceRecorder)
                 .compactionTrigger(request -> request.currentEventCount() > 100)
                 .compactionStrategy(SlidingWindowCompactionStrategy.builder().maxEvents(90).build())
                 .build();

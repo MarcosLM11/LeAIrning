@@ -56,6 +56,16 @@ const ICON = 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-l
               </span>
               <div class="min-w-0 flex-1 text-[15px] leading-relaxed">
                 <p class="whitespace-pre-wrap">{{ m.text || '…' }}</p>
+                @if (m.sources?.length) {
+                  <div class="mt-4 flex flex-wrap gap-2">
+                    @for (s of m.sources; track $index) {
+                      <span class="inline-flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 text-xs text-mute">
+                        <svg class="size-3 ${ICON}" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /></svg>
+                        {{ s.filename }}@if (s.page !== null) { · p. {{ s.page }} }
+                      </span>
+                    }
+                  </div>
+                }
                 <div class="mt-3 flex gap-1 text-mute">
                   <button (click)="copy(m.text)" aria-label="Copiar" class="grid size-8 place-items-center rounded-lg hover:bg-card hover:text-ink">
                     <svg class="size-4 ${ICON}" viewBox="0 0 24 24"><path d="M8 8h12v12H8z" /><path d="M4 16V4h12" /></svg>
@@ -166,6 +176,10 @@ export class Chat {
     this.service.conversations().subscribe((l) => this.conversations.set(l));
   }
 
+  private load(id: string) {
+    this.service.history(id).subscribe((m) => this.messages.set(m));
+  }
+
   toggle(id: string) {
     this.selected.update((s) => {
       const c = new Set(s);
@@ -177,7 +191,7 @@ export class Chat {
   select(id: string) {
     this.current.set(id);
     this.error.set('');
-    this.service.history(id).subscribe((m) => this.messages.set(m));
+    this.load(id);
     this.open.set(false);
   }
 
@@ -217,6 +231,8 @@ export class Chat {
       complete: () => {
         this.sending.set(false);
         this.loadChats();
+        // The stored answer carries its sources; the streamed text has none.
+        this.load(this.current());
       },
     });
   }

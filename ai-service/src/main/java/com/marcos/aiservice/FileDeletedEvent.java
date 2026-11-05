@@ -1,4 +1,4 @@
-package com.marcos.aiservice.quizz;
+package com.marcos.aiservice;
 
 import java.util.UUID;
 

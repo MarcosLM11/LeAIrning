@@ -81,12 +81,14 @@ class ChatControllerTest {
 
     @Test
     void historyReturnsRoleAndText() throws Exception {
-        given(chatService.history("a", userId)).willReturn(List.of(new MessageView("user", "hola", Instant.parse("2026-11-02T10:00:00Z"))));
+        given(chatService.history("a", userId)).willReturn(List.of(new MessageView("assistant", "hola", Instant.parse("2026-11-02T10:00:00Z"), List.of(new MessageView.Source("kafka.pdf", 12)))));
 
         mockMvc.perform(get("/api/v1/chat/history").param("conversationId", "a").with(jwt().jwt(j -> j.subject(userId.toString()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].role").value("user"))
-                .andExpect(jsonPath("$[0].text").value("hola"));
+                .andExpect(jsonPath("$[0].role").value("assistant"))
+                .andExpect(jsonPath("$[0].text").value("hola"))
+                .andExpect(jsonPath("$[0].sources[0].filename").value("kafka.pdf"))
+                .andExpect(jsonPath("$[0].sources[0].page").value(12));
     }
 
     @Test

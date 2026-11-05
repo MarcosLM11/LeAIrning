@@ -10,9 +10,16 @@ export interface Conversation {
   createdAt: string;
 }
 
+export interface Source {
+  filename: string;
+  page: number | null;
+}
+
+// sources only comes from the server: only answers grounded on documents have any.
 export interface Message {
   role: 'user' | 'assistant';
   text: string;
+  sources?: Source[];
 }
 
 // An SSE event may carry several "data:" lines; the server writes "data: " + chunk, so one leading space is separator.
