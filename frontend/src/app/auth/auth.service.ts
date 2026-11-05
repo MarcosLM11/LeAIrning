@@ -15,6 +15,12 @@ export class AuthService {
       .pipe(tap((r) => this.token.set(r.accessToken)));
   }
 
+  refresh() {
+    return this.http
+      .post<{ accessToken: string }>(`${API}/auth/refresh`, null, { withCredentials: true })
+      .pipe(tap((r) => this.token.set(r.accessToken)));
+  }
+
   register(user: { name: string; username: string; email: string; password: string }) {
     return this.http.post(`${API}/users`, user);
   }

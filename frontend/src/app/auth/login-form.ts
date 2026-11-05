@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -18,6 +19,7 @@ import { AuthService } from './auth.service';
 
 export class LoginForm {
   private auth = inject(AuthService);
+  private router = inject(Router);
   identifier = '';
   password = '';
   error = signal('');
@@ -26,9 +28,8 @@ export class LoginForm {
   submit() {
     this.loading.set(true);
     this.auth.login(this.identifier, this.password).subscribe({
-      // TODO: navegar a la home cuando exista
+      next: () => this.router.navigateByUrl('/'),
       error: () => { this.error.set('Credenciales incorrectas'); this.loading.set(false); },
-      complete: () => this.loading.set(false),
     });
   }
 }
