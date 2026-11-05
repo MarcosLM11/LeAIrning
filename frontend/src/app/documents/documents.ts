@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DocumentCard } from './document-card';
+import { DocumentModal } from './document-modal';
 import { Doc, DocumentsService } from './documents.service';
 import { TYPE_KEYS, typeOf } from './file-type';
 
@@ -17,7 +18,7 @@ const RANGES = [
 @Component({
   selector: 'app-documents',
   host: { class: 'mx-auto block max-w-[1040px]' },
-  imports: [FormsModule, DocumentCard],
+  imports: [FormsModule, DocumentCard, DocumentModal],
   template: `
     <header class="mb-8">
       <h1 class="text-2xl font-semibold tracking-tight">Documentos</h1>
@@ -55,8 +56,12 @@ const RANGES = [
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      @for (d of shown(); track d.id) { <app-document-card [doc]="d" /> }
+      @for (d of shown(); track d.id) { <app-document-card [doc]="d" (open)="selected.set(d)" (remove)="remove(d)" /> }
     </div>
+
+    @if (selected(); as d) {
+      <app-document-modal [doc]="d" (closed)="selected.set(null)" (remove)="remove(d)" />
+    }
   `,
 })
 
@@ -65,6 +70,7 @@ export class Documents {
   docs = signal<Doc[]>([]);
   error = signal('');
   dragging = signal(false);
+  selected = signal<Doc | null>(null);
   types = TYPE_KEYS;
   ranges = RANGES;
   search = signal('');
@@ -84,6 +90,14 @@ export class Documents {
 
   load() {
     this.service.list().subscribe((docs) => this.docs.set([...docs].sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt))));
+  }
+
+  remove(d: Doc) {
+    if (!confirm(`¿Eliminar "${d.name}"? No se puede deshacer.`)) return;
+    this.service.remove(d.id).subscribe({
+      next: () => { this.selected.set(null); this.load(); },
+      error: () => this.error.set('No se pudo eliminar el archivo'),
+    });
   }
 
   drop(e: DragEvent) {

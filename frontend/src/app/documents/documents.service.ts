@@ -5,6 +5,7 @@ import { API } from '../api';
 export interface Doc {
   id: string;
   name: string;
+  contentType: string;
   size: number;
   status: 'UPLOADING' | 'UPLOADED' | 'FAILED';
   uploadedAt: string;
@@ -16,6 +17,10 @@ export class DocumentsService {
 
   list() {
     return this.http.get<Doc[]>(`${API}/files`);
+  }
+
+  remove(id: string) {
+    return this.http.delete<void>(`${API}/files/${id}`);
   }
 
   upload(file: File) {
