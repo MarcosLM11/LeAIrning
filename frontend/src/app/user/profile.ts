@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth/auth.service';
 import { UserService } from './user.service';
 
 @Component({
   selector: 'app-profile',
-  host: { class: 'mx-auto block max-w-[760px]' },
+  host: { class: 'mx-auto block max-w-[760px]', '(document:keydown.escape)': 'zoom.set(false)' },
   imports: [DatePipe, FormsModule],
   template: `
     <header class="mb-6">
@@ -17,7 +18,9 @@ import { UserService } from './user.service';
       <section class="mb-5 flex items-center gap-5 rounded-2xl border border-line bg-card p-6">
         <div class="relative shrink-0">
           @if (avatarUrl(); as src) {
-            <img [src]="src" alt="" class="size-[72px] rounded-full object-cover" />
+            <button (click)="zoom.set(true)" aria-label="Ver foto de perfil" class="block cursor-zoom-in rounded-full">
+              <img [src]="src" alt="" class="size-[72px] rounded-full object-cover" />
+            </button>
           } @else {
             <span class="grid size-[72px] place-items-center rounded-full bg-brand text-[28px] font-semibold text-white">{{ u.name.charAt(0).toUpperCase() }}</span>
           }
@@ -58,7 +61,7 @@ import { UserService } from './user.service';
       </section>
     }
 
-    <section class="flex items-center justify-between gap-4 rounded-2xl border border-line bg-card p-6">
+    <section class="mb-5 flex items-center justify-between gap-4 rounded-2xl border border-line bg-card p-6">
       <div>
         <h2 class="text-[15px] font-semibold">Apariencia</h2>
         <p class="mt-0.5 text-[13px] text-mute">Elige el tema de la interfaz.</p>
@@ -70,14 +73,36 @@ import { UserService } from './user.service';
         }
       </div>
     </section>
+
+    <section class="flex items-center justify-between gap-4 rounded-2xl border border-line bg-card p-6">
+      <div>
+        <h2 class="text-[15px] font-semibold">Sesión</h2>
+        <p class="mt-0.5 text-[13px] text-mute">Cierra la sesión en este dispositivo.</p>
+      </div>
+      <button (click)="auth.logout()" class="inline-flex h-10 items-center gap-2 rounded-[10px] border border-line px-4 text-sm font-medium hover:bg-app">
+        <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>Cerrar sesión
+      </button>
+    </section>
+
+    @if (zoom() && avatarUrl(); as src) {
+      <div (click)="zoom.set(false)" class="fixed inset-0 z-50 grid place-items-center bg-black/70 backdrop-blur-sm">
+        <button (click)="zoom.set(false)" aria-label="Cerrar" class="absolute right-6 top-6 grid size-10 place-items-center rounded-full bg-white/15 text-white hover:bg-white/25">
+          <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+        </button>
+        <img [src]="src" (click)="$event.stopPropagation()" alt="Foto de perfil" class="aspect-square w-[min(480px,86vw)] rounded-full object-cover shadow-2xl" />
+        <p class="absolute bottom-7 text-[13px] text-white/70">Esc o clic fuera para cerrar</p>
+      </div>
+    }
   `,
 })
 
 export class Profile {
   private users = inject(UserService);
+  auth = inject(AuthService);
   me = this.users.me;
   avatarUrl = this.users.avatarUrl;
   avatarError = signal('');
+  zoom = signal(false);
   form = { name: '', username: '' };
   error = signal('');
   saving = signal(false);

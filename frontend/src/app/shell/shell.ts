@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ThemeToggle } from '../theme-toggle';
+import { AuthService } from '../auth/auth.service';
 import { UserService } from '../user/user.service';
 
 // Iconos lucide (trazos SVG).
@@ -52,7 +53,13 @@ const NAV = [
             }
             @if (!collapsed()) { <span class="text-[13px] font-medium">{{ me()?.name }}</span> }
           </a>
-          <app-theme-toggle />
+          <div class="flex gap-1" [class]="collapsed() ? 'flex-col' : ''">
+            <app-theme-toggle />
+            <button (click)="auth.logout()" title="Cerrar sesión" aria-label="Cerrar sesión"
+                    class="grid size-9 place-items-center rounded-[10px] border border-line bg-card text-mute hover:text-red-600">
+              <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
+            </button>
+          </div>
         </div>
       </aside>
       <main class="flex-1 px-8 py-10">
@@ -64,6 +71,7 @@ const NAV = [
 
 export class Shell {
   private users = inject(UserService);
+  auth = inject(AuthService);
   me = this.users.me;
   avatarUrl = this.users.avatarUrl;
   nav = NAV;

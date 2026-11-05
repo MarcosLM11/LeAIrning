@@ -22,6 +22,11 @@ export class UserService {
     return this.http.put<User>(`${API}/users/${this.me()!.id}`, { name, username }).pipe(tap((u) => this.me.set(u)));
   }
 
+  clear() {
+    this.me.set(null);
+    this.avatarUrl.set(null);
+  }
+
   loadMe() {
     return this.http.get<User>(`${API}/users/me`).pipe(tap((u) => { this.me.set(u); this.loadAvatar(u); }));
   }
