@@ -1,7 +1,6 @@
 package com.marcos.aiservice.chat;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,23 +16,29 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping
-    public String chat(@RequestBody String question, @RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
-        return chatService.ask(question, conversationId, userId(auth));
+    public String chat(
+            @RequestBody String question, @RequestParam(defaultValue = "default") String conversationId,
+            @RequestParam(defaultValue = "") List<UUID> fileIds, Authentication auth
+    ) {
+        return chatService.ask(question, conversationId, userId(auth), fileIds);
     }
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> stream(@RequestBody String question, @RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
-        return chatService.stream(question, conversationId, userId(auth));
+    public Flux<String> stream(
+            @RequestBody String question, @RequestParam(defaultValue = "default") String conversationId,
+            @RequestParam(defaultValue = "") List<UUID> fileIds, Authentication auth
+    ) {
+        return chatService.stream(question, conversationId, userId(auth), fileIds);
+    }
+
+    @GetMapping("/conversations")
+    public List<ConversationView> conversations(Authentication auth) {
+        return chatService.conversations(userId(auth));
     }
 
     @GetMapping("/history")
-    public List<Message> history(@RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
+    public List<MessageView> history(@RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
         return chatService.history(conversationId, userId(auth));
-    }
-
-    @GetMapping("/history/short")
-    public List<String> shortHistory(@RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
-        return chatService.shortHistory(conversationId, userId(auth));
     }
 
     @DeleteMapping("/history")

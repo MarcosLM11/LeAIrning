@@ -21,13 +21,31 @@ import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.session.SessionService;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
-/** Runs the real Spring AI RAG advisor to prove the per-request filter reaches the vector store query. */
 class ChatServiceRagFilterTest {
 
     @Test
     void ragSearchIsFilteredByRequestingUser() {
+        var userId = UUID.randomUUID();
+
+        assertThat(searchFilter(userId, List.of()))
+                .isEqualTo(new FilterExpressionBuilder().eq("userId", userId.toString()).build());
+    }
+
+    @Test
+    void ragSearchIsNarrowedToTheSelectedFiles() {
+        var userId = UUID.randomUUID();
+        var a = UUID.randomUUID();
+        var b = UUID.randomUUID();
+        var builder = new FilterExpressionBuilder();
+
+        assertThat(searchFilter(userId, List.of(a, b))).isEqualTo(
+                builder.and(builder.eq("userId", userId.toString()), builder.in("fileId", a.toString(), b.toString())).build());
+    }
+
+    private Filter.Expression searchFilter(UUID userId, List<UUID> fileIds) {
         var model = mock(ChatModel.class);
         when(model.getOptions()).thenReturn(ChatOptions.builder().build());
         when(model.call(any(Prompt.class))).thenReturn(new ChatResponse(List.of(new Generation(new AssistantMessage("ok")))));
@@ -37,13 +55,11 @@ class ChatServiceRagFilterTest {
                         .documentRetriever(VectorStoreDocumentRetriever.builder().vectorStore(vectorStore).build())
                         .build())
                 .build();
-        var userId = UUID.randomUUID();
 
-        new ChatService(client, mock(SessionService.class)).ask("hola", "1", userId);
+        new ChatService(client, mock(SessionService.class)).ask("hola", "1", userId, fileIds);
 
         var request = ArgumentCaptor.forClass(SearchRequest.class);
         verify(vectorStore).similaritySearch(request.capture());
-        assertThat(request.getValue().getFilterExpression())
-                .isEqualTo(new FilterExpressionBuilder().eq("userId", userId.toString()).build());
+        return request.getValue().getFilterExpression();
     }
 }

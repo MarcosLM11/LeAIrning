@@ -32,7 +32,7 @@ import { typeOf } from './file-type';
           <span class="size-1.5 rounded-full" [class]="ready() ? 'bg-green-500' : 'bg-mute/50'"></span>{{ status() }}
         </span>
         <div class="flex gap-4 text-[13px] font-medium" [class]="ready() ? 'text-brand' : 'pointer-events-none text-mute/40'" (click)="$event.stopPropagation()">
-          <a routerLink="/chat">Chat</a>
+          <a routerLink="/chat" [queryParams]="{ doc: doc().id }">Chat</a>
           <a routerLink="/quizzes">Cuestionario</a>
         </div>
       </div>

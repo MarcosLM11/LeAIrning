@@ -34,7 +34,7 @@ import { typeOf } from './file-type';
         <button (click)="remove.emit()" class="h-10 rounded-[10px] px-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950">Eliminar</button>
         <div class="flex gap-2">
           <a routerLink="/quizzes" class="grid h-10 place-items-center rounded-[10px] border border-line px-4 text-sm font-medium hover:bg-app">Cuestionario</a>
-          <a routerLink="/chat" class="grid h-10 place-items-center rounded-[10px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-hover">Chat</a>
+          <a routerLink="/chat" [queryParams]="{ doc: doc().id }" class="grid h-10 place-items-center rounded-[10px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-hover">Chat</a>
         </div>
       </div>
     </dialog>
