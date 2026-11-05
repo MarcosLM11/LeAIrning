@@ -31,6 +31,8 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    private String avatarContentType;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
@@ -45,7 +47,12 @@ public class User {
         this.password = password;
     }
 
-    void update(String name) {
+    void setAvatarContentType(String avatarContentType) {
+        this.avatarContentType = avatarContentType;
+    }
+
+    void update(String name, String username) {
         this.name = name;
+        this.username = username;
     }
 }

@@ -45,7 +45,11 @@ const NAV = [
         </div>
         <div class="flex items-center gap-3 pb-5" [class]="collapsed() ? 'flex-col' : 'justify-between px-5'">
           <a routerLink="/profile" routerLinkActive="bg-app" title="Perfil" class="-m-1 flex items-center gap-2.5 rounded-[10px] p-1 hover:bg-app">
-            <span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">{{ me()?.name?.charAt(0)?.toUpperCase() }}</span>
+            @if (avatarUrl(); as src) {
+              <img [src]="src" alt="" class="size-8 rounded-full object-cover" />
+            } @else {
+              <span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">{{ me()?.name?.charAt(0)?.toUpperCase() }}</span>
+            }
             @if (!collapsed()) { <span class="text-[13px] font-medium">{{ me()?.name }}</span> }
           </a>
           <app-theme-toggle />
@@ -61,6 +65,7 @@ const NAV = [
 export class Shell {
   private users = inject(UserService);
   me = this.users.me;
+  avatarUrl = this.users.avatarUrl;
   nav = NAV;
   collapsed = signal(localStorage.getItem('sidebar') === 'collapsed');
 

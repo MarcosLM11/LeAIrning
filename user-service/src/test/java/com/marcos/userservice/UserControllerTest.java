@@ -60,7 +60,7 @@ class UserControllerTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
 
         mvc.perform(put("/api/v1/users/" + id).header("Authorization", token)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Bea\"}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Bea\",\"username\":\"" + username + "\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Bea"));
 
         mvc.perform(delete("/api/v1/users/" + id).header("Authorization", token)).andExpect(status().isNoContent());
@@ -73,13 +73,11 @@ class UserControllerTest {
         var b = "b" + UUID.randomUUID();
         var idA = register(a);
         var idB = register(b);
-        var tokenA = "Bearer " + JsonPath.read(
-                mvc.perform(login(a, "password1")).andReturn().getResponse().getContentAsString(), "$.accessToken");
+        var tokenA = "Bearer " + JsonPath.read(mvc.perform(login(a, "password1")).andReturn().getResponse().getContentAsString(), "$.accessToken");
 
         mvc.perform(get("/api/v1/users/" + idA).header("Authorization", tokenA)).andExpect(status().isOk());
         mvc.perform(get("/api/v1/users/" + idB).header("Authorization", tokenA)).andExpect(status().isForbidden());
-        mvc.perform(put("/api/v1/users/" + idB).header("Authorization", tokenA)
-                .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"X\"}")).andExpect(status().isForbidden());
+        mvc.perform(put("/api/v1/users/" + idB).header("Authorization", tokenA).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"X\",\"username\":\"x\"}")).andExpect(status().isForbidden());
         mvc.perform(delete("/api/v1/users/" + idB).header("Authorization", tokenA)).andExpect(status().isForbidden());
         mvc.perform(get("/api/v1/users").header("Authorization", tokenA)).andExpect(status().isForbidden());
 
