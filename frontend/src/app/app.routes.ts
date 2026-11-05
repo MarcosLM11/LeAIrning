@@ -10,11 +10,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
       { path: 'documents', loadComponent: () => import('./documents/documents').then((m) => m.Documents) },
       { path: 'chat', loadComponent: () => import('./chat/chat').then((m) => m.Chat) },
-      // Secciones vacías por ahora.
-      ...['quizzes'].map((path) => ({
-        path,
-        loadComponent: () => import('./shell/empty').then((m) => m.Empty),
-      })),
+      { path: 'quizzes', loadComponent: () => import('./quizzes/quizzes').then((m) => m.Quizzes) },
     ],
   },
   {
