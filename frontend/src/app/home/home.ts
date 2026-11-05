@@ -17,6 +17,7 @@ const QUIZZES = [
 
 @Component({
   selector: 'app-home',
+  host: { class: 'mx-auto block max-w-[960px]' },
   imports: [RouterLink],
   template: `
     <header class="mb-8">

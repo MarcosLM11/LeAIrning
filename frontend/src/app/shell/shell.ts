@@ -51,7 +51,7 @@ const NAV = [
         </div>
       </aside>
       <main class="flex-1 px-8 py-10">
-        <div class="mx-auto max-w-[960px]"><router-outlet /></div>
+        <router-outlet />
       </main>
     </div>
   `,

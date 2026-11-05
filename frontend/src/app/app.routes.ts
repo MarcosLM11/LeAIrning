@@ -8,8 +8,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
+      { path: 'documents', loadComponent: () => import('./documents/documents').then((m) => m.Documents) },
       // Secciones vacías por ahora.
-      ...['documents', 'chat', 'quizzes'].map((path) => ({
+      ...['chat', 'quizzes'].map((path) => ({
         path,
         loadComponent: () => import('./shell/empty').then((m) => m.Empty),
       })),

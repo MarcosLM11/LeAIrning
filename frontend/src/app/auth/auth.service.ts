@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { tap } from 'rxjs';
+import { API } from '../api';
 
-const API = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

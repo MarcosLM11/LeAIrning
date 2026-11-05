@@ -29,3 +29,6 @@ Single centered column (max 380px) on bg. Small wordmark "LeAIrning" (text + tin
 - Main area on bg #FAFAFA, content max-width 960px, 32px padding. Page title 24/600.
 - Cards: surface, 1px border, radius 16px, no shadow. Status chips: 12px text, radius 6px, neutral bg; "Listo" uses success tint only for the status dot.
 - Logo mark: graduation cap (filled indigo diamond, curved base line, vertical tassel line) with a small 4-point spark at top right, indigo #4F46E5.
+
+## File-type colors (extension badge + file icon tile)
+PDF red (#DC2626 on #FEF2F2), DOCX blue (#2563EB on #EFF6FF), TXT gray (#737373 on #F5F5F5), CSV green (#16A34A on #F0FDF4). Same pattern for new formats (e.g. PPTX orange). Only for file types; the UI accent stays indigo.
