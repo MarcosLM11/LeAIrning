@@ -56,6 +56,9 @@ class UserControllerTest {
         mvc.perform(get("/api/v1/users/" + id).header("Authorization", token))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Ana"));
 
+        mvc.perform(get("/api/v1/users/me").header("Authorization", token))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
+
         mvc.perform(put("/api/v1/users/" + id).header("Authorization", token)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Bea\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Bea"));

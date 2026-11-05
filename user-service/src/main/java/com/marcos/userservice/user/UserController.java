@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,11 @@ class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     UserResponse create(@Valid @RequestBody CreateUserRequest r) {
         return service.create(r);
+    }
+
+    @GetMapping("/me")
+    UserResponse me(Authentication auth) {
+        return service.get(UUID.fromString(auth.getName()));
     }
 
     @GetMapping("/{id}")

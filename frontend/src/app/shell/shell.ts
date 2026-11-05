@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ThemeToggle } from '../theme-toggle';
+import { UserService } from '../user/user.service';
 
 // Iconos lucide (trazos SVG).
 const NAV = [
@@ -44,8 +45,8 @@ const NAV = [
         </div>
         <div class="flex items-center gap-3 pb-5" [class]="collapsed() ? 'flex-col' : 'justify-between px-5'">
           <div class="flex items-center gap-2.5">
-            <span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">M</span>
-            @if (!collapsed()) { <span class="text-[13px] font-medium">Marcos</span> }
+            <span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">{{ me()?.name?.charAt(0)?.toUpperCase() }}</span>
+            @if (!collapsed()) { <span class="text-[13px] font-medium">{{ me()?.name }}</span> }
           </div>
           <app-theme-toggle />
         </div>
@@ -58,8 +59,14 @@ const NAV = [
 })
 
 export class Shell {
+  private users = inject(UserService);
+  me = this.users.me;
   nav = NAV;
   collapsed = signal(localStorage.getItem('sidebar') === 'collapsed');
+
+  constructor() {
+    this.users.loadMe().subscribe();
+  }
 
   toggle() {
     this.collapsed.update((c) => !c);
