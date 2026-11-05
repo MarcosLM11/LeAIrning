@@ -25,7 +25,7 @@ class QuizzRepositoryTest {
 
     @Test
     void savesQuestionsInOrderAsJson() {
-        var quizz = new Quizz(UUID.randomUUID(), UUID.randomUUID());
+        var quizz = new Quizz(UUID.randomUUID(), UUID.randomUUID(), 2, 3, Difficulty.MEDIO);
         quizz.setQuestions(List.of(
                 new GeneratedQuestion("first?", List.of("a", "b", "c"), 1, "because"),
                 new GeneratedQuestion("second?", List.of("x", "y"), 0, null)));

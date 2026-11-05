@@ -1,11 +1,8 @@
-import { Component, ElementRef, afterNextRender, output, signal, viewChild } from '@angular/core';
-
-export type QuizzParams = { doc: string; questions: number; options: number; difficulty: string };
+import { Component, ElementRef, afterNextRender, inject, output, signal, viewChild } from '@angular/core';
+import { DocumentsService } from '../documents/documents.service';
+import { DIFFICULTIES, Difficulty, QuizzParams } from './quizzes.service';
 
 const ICON = 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]';
-const DIFFICULTIES = ['Fácil', 'Medio', 'Difícil'];
-// Boceto: documentos mock hasta conectar con file-service.
-const DOCS = ['arquitectura-mensajeria.pdf', 'apuntes-kafka.docx', 'patrones-diseno.pdf', 'spring-security.docx'];
 
 // <dialog> nativo: pinta el fondo, atrapa el foco y cierra con Esc.
 @Component({
@@ -26,8 +23,8 @@ const DOCS = ['arquitectura-mensajeria.pdf', 'apuntes-kafka.docx', 'patrones-dis
       <div class="space-y-4 px-6 pb-2">
         <label class="block text-[13px] font-medium">
           Documento
-          <select class="input select mt-1.5 font-normal" [value]="doc()" (change)="doc.set($any($event.target).value)">
-            @for (d of docs; track d) { <option>{{ d }}</option> }
+          <select class="input select mt-1.5 font-normal" [value]="fileId()" (change)="fileId.set($any($event.target).value)">
+            @for (d of docs(); track d.id) { <option [value]="d.id">{{ d.name }}</option> }
           </select>
         </label>
 
@@ -54,7 +51,7 @@ const DOCS = ['arquitectura-mensajeria.pdf', 'apuntes-kafka.docx', 'patrones-dis
           Dificultad
           <div class="mt-1.5 flex h-10 rounded-[10px] border border-line bg-app p-1 text-[13px]">
             @for (d of difficulties; track d) {
-              <button (click)="difficulty.set(d)" [class]="d === difficulty() ? 'bg-card shadow-sm' : 'text-mute'" class="flex-1 rounded-md">{{ d }}</button>
+              <button (click)="difficulty.set(d.key)" [class]="d.key === difficulty() ? 'bg-card shadow-sm' : 'text-mute'" class="flex-1 rounded-md">{{ d.label }}</button>
             }
           </div>
         </div>
@@ -67,7 +64,7 @@ const DOCS = ['arquitectura-mensajeria.pdf', 'apuntes-kafka.docx', 'patrones-dis
 
       <div class="flex justify-end gap-2 p-6 pt-5">
         <button (click)="dlg.close()" class="h-10 rounded-[10px] border border-line px-4 text-sm font-medium hover:bg-app">Cancelar</button>
-        <button (click)="submit()" class="flex h-10 items-center gap-2 rounded-[10px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-hover">
+        <button (click)="submit()" [disabled]="!fileId()" class="flex h-10 items-center gap-2 rounded-[10px] bg-brand px-4 text-sm font-medium text-white hover:bg-brand-hover disabled:opacity-50">
           <svg class="size-4 ${ICON}" viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2z" /></svg>
           Generar
         </button>
@@ -82,10 +79,10 @@ export class QuizzModal {
   generate = output<QuizzParams>();
   private dlg = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 
-  docs = DOCS;
+  docs = signal<{ id: string; name: string }[]>([]);
   difficulties = DIFFICULTIES;
-  doc = signal(DOCS[0]);
-  difficulty = signal('Medio');
+  fileId = signal('');
+  difficulty = signal<Difficulty>('MEDIO');
   questions = signal(10);
   options = signal(4);
   steppers = [
@@ -94,11 +91,15 @@ export class QuizzModal {
   ];
 
   constructor() {
+    inject(DocumentsService).list().subscribe((l) => {
+      this.docs.set(l.filter((d) => d.status === 'READY'));
+      this.fileId.set(this.docs()[0]?.id ?? '');
+    });
     afterNextRender(() => this.dlg().nativeElement.showModal());
   }
 
   submit() {
-    this.generate.emit({ doc: this.doc(), questions: this.questions(), options: this.options(), difficulty: this.difficulty() });
+    this.generate.emit({ fileId: this.fileId(), questions: this.questions(), options: this.options(), difficulty: this.difficulty() });
     this.dlg().nativeElement.close();
   }
 }

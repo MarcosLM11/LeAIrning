@@ -2,6 +2,7 @@ package com.marcos.aiservice.quizz;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -17,15 +18,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 class QuizzServiceTest {
 
     private final QuizzRepository repository = mock(QuizzRepository.class);
+    private final AttemptRepository attempts = mock(AttemptRepository.class);
     @SuppressWarnings("unchecked")
     private final KafkaTemplate<String, QuizzRequestedEvent> kafka = mock(KafkaTemplate.class);
-    private final QuizzService service = new QuizzService(repository, kafka);
+    private final QuizzService service = new QuizzService(repository, attempts, kafka);
     private final UUID userId = UUID.randomUUID();
     private final UUID fileId = UUID.randomUUID();
     private final UUID id = UUID.randomUUID();
 
     private Quizz pendingQuizz() {
-        var quizz = new Quizz(fileId, userId);
+        var quizz = new Quizz(fileId, userId, 5, 3, Difficulty.FACIL);
         ReflectionTestUtils.setField(quizz, "id", id);
         when(repository.findById(id)).thenReturn(Optional.of(quizz));
         return quizz;
@@ -52,6 +54,80 @@ class QuizzServiceTest {
         assertThat(result).isEqualTo(id);
         verify(kafka).send(QuizzService.TOPIC, id.toString(),
                 new QuizzRequestedEvent(id, userId, "a@a.com", fileId, 5, 3, Difficulty.FACIL));
+    }
+
+    @Test
+    void listReturnsSummariesOfTheUser() {
+        var quizz = pendingQuizz();
+        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+
+        assertThat(service.list(userId)).extracting(QuizzSummary::id, QuizzSummary::questions, QuizzSummary::difficulty)
+                .containsExactly(tuple(id, 5, Difficulty.FACIL));
+    }
+
+    private Quizz readyQuizz() {
+        var quizz = pendingQuizz();
+        quizz.setQuestions(List.of(
+                new GeneratedQuestion("q1", List.of("a", "b", "c"), 1, "why1"),
+                new GeneratedQuestion("q2", List.of("a", "b", "c"), 2, "why2")));
+        quizz.setStatus(QuizzStatus.READY);
+        return quizz;
+    }
+
+    @Test
+    void retryRelaunchesOnlyFailedQuizzes() {
+        var quizz = pendingQuizz();
+        assertThatThrownBy(() -> service.retry(userId, "a@a.com", id)).hasMessageContaining("409");
+
+        quizz.setStatus(QuizzStatus.FAILED);
+        service.retry(userId, "a@a.com", id);
+
+        assertThat(quizz.getStatus()).isEqualTo(QuizzStatus.PENDING);
+        verify(repository).save(quizz);
+        verify(kafka).send(QuizzService.TOPIC, id.toString(),
+                new QuizzRequestedEvent(id, userId, "a@a.com", fileId, 5, 3, Difficulty.FACIL));
+    }
+
+    @Test
+    void submitGradesOnServerAndStoresAttempt() {
+        readyQuizz();
+
+        var result = service.submit(userId, id, List.of(1, 0));
+
+        assertThat(result.score()).isEqualTo(1);
+        assertThat(result.total()).isEqualTo(2);
+        assertThat(result.corrections()).extracting(AttemptResult.Correction::correctIndex).containsExactly(1, 2);
+        verify(attempts).save(any(Attempt.class));
+    }
+
+    @Test
+    void submitRejectsWrongShapeOrNotReady() {
+        pendingQuizz();
+        assertThatThrownBy(() -> service.submit(userId, id, List.of(0))).hasMessageContaining("409");
+        readyQuizz();
+        assertThatThrownBy(() -> service.submit(userId, id, List.of(0))).hasMessageContaining("400");
+        assertThatThrownBy(() -> service.submit(userId, id, List.of(0, 3))).hasMessageContaining("400");
+        assertThatThrownBy(() -> service.submit(UUID.randomUUID(), id, List.of(0, 0))).hasMessageContaining("404");
+    }
+
+    @Test
+    void listCountsGeneratedQuestionsOnceReady() {
+        var quizz = readyQuizz(); // requested 5, the model produced 2
+        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+
+        assertThat(service.list(userId)).extracting(QuizzSummary::questions).containsExactly(2);
+    }
+
+    @Test
+    void listShowsLatestScore() {
+        var quizz = pendingQuizz();
+        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+        var latest = mock(AttemptRepository.LatestScore.class);
+        when(latest.getQuizzId()).thenReturn(id);
+        when(latest.getScore()).thenReturn(3);
+        when(attempts.findLatestScores(userId)).thenReturn(List.of(latest));
+
+        assertThat(service.list(userId)).extracting(QuizzSummary::score).containsExactly(3);
     }
 
     @Test

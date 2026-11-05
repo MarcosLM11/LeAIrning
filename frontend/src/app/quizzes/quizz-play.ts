@@ -1,18 +1,8 @@
-import { Component, ElementRef, afterNextRender, computed, input, output, signal, viewChild } from '@angular/core';
-
-type Question = { text: string; options: string[]; correct: number; explanation: string };
+import { Component, ElementRef, OnInit, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { AttemptResult, Question, QuizzesService } from './quizzes.service';
 
 const ICON = 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]';
 const LETTERS = 'ABCDEF';
-// Boceto: preguntas mock hasta conectar con GET /quizz/{id}.
-const QUESTIONS: Question[] = [
-  { text: '¿Qué es un topic en Kafka?', options: ['Una categoría de mensajes dividida en particiones', 'Un tipo de consumidor', 'Un servidor del clúster', 'Una cola que borra al leer'], correct: 0, explanation: 'Un topic agrupa mensajes y se divide en particiones para escalar.' },
-  { text: '¿Para qué sirve un consumer group?', options: ['Cifrar los mensajes', 'Repartir las particiones entre varios consumidores', 'Crear topics nuevos', 'Replicar el clúster'], correct: 1, explanation: 'Cada partición la lee un único consumidor del grupo.' },
-  { text: '¿Cuál describe mejor cómo Kafka gestiona los mensajes?', options: ['Los conserva en disco y los consumidores leen por offset', 'Los elimina cuando un consumidor los confirma', 'Solo funciona con una partición por tema', 'No permite que varios consumidores lean el mismo mensaje'], correct: 0, explanation: 'Kafka retiene los mensajes según la política de retención, no según su confirmación.' },
-  { text: '¿Qué ventaja ofrecen las particiones?', options: ['Menos espacio en disco', 'Paralelismo y escalado horizontal', 'Mensajes siempre ordenados entre particiones', 'Evitar la replicación'], correct: 1, explanation: 'Las particiones permiten repartir la carga entre varios brokers y consumidores.' },
-  { text: '¿Qué ofrece RabbitMQ que Kafka no hace por defecto?', options: ['Retención de mensajes en disco', 'Enrutado flexible con exchanges', 'Lectura por offset', 'Particiones'], correct: 1, explanation: 'RabbitMQ enruta con exchanges y bindings antes de llegar a las colas.' },
-];
-
 // <dialog> nativo: pinta el fondo, atrapa el foco y cierra con Esc.
 @Component({
   selector: 'app-quizz-play',
@@ -20,7 +10,11 @@ const QUESTIONS: Question[] = [
     <dialog #dlg (close)="closed.emit()" (click)="$event.target === dlg && dlg.close()"
             class="m-auto w-full max-w-[560px] overflow-hidden rounded-2xl border border-line bg-card p-0 text-ink backdrop:bg-black/40">
       <div class="flex max-h-[640px] flex-col">
-        @if (!done()) {
+        @if (error()) {
+          <p class="p-6 text-sm text-red-600">{{ error() }}</p>
+        } @else if (!questions().length) {
+          <p class="p-6 text-sm text-mute">Cargando…</p>
+        } @else if (!done()) {
           <div class="p-6 pb-4">
             <div class="flex items-start justify-between">
               <div class="min-w-0">
@@ -88,7 +82,7 @@ const QUESTIONS: Question[] = [
           <div class="min-h-0 flex-1 overflow-y-auto border-t border-line">
             <p class="px-6 pb-2 pt-4 text-sm font-semibold">Revisión</p>
             <div class="mx-6 mb-4 divide-y divide-line overflow-hidden rounded-xl border border-line">
-              @for (q of questions; track $index) {
+              @for (q of questions(); track $index) {
                 <div class="px-4 py-3">
                   <button (click)="toggle($index)" class="flex w-full items-center gap-3 text-left">
                     <span [class]="right($index) ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'"
@@ -105,8 +99,10 @@ const QUESTIONS: Question[] = [
                       @if (!right($index)) {
                         <p class="text-red-700 dark:text-red-300"><span class="font-medium">Tu respuesta: </span>{{ q.options[answers()[$index]] }}</p>
                       }
-                      <p class="text-green-700 dark:text-green-300"><span class="font-medium">Correcta: </span>{{ q.options[q.correct] }}</p>
-                      <p class="rounded-[10px] bg-app px-3 py-2 text-mute">{{ q.explanation }}</p>
+                      <p class="text-green-700 dark:text-green-300"><span class="font-medium">Correcta: </span>{{ q.options[corrections()[$index].correctIndex] }}</p>
+                      @if (corrections()[$index].explanation; as e) {
+                        <p class="rounded-[10px] bg-app px-3 py-2 text-mute">{{ e }}</p>
+                      }
                     </div>
                   }
                 </div>
@@ -126,23 +122,30 @@ const QUESTIONS: Question[] = [
   `,
 })
 
-export class QuizzPlay {
+export class QuizzPlay implements OnInit {
+  id = input.required<string>();
   doc = input.required<string>();
   difficulty = input.required<string>();
   closed = output();
-  finished = output<{ score: number; total: number }>();
+  finished = output();
+  private service = inject(QuizzesService);
   private dlg = viewChild.required<ElementRef<HTMLDialogElement>>('dlg');
 
-  questions = QUESTIONS;
-  total = QUESTIONS.length;
+  questions = signal<Question[]>([]);
+  result = signal<AttemptResult | null>(null);
+  error = signal('');
   letters = LETTERS;
   i = signal(0);
   answers = signal<number[]>([]);
-  done = signal(false);
   open = signal(new Set<number>());
 
-  q = computed(() => this.questions[this.i()]);
-  score = computed(() => this.questions.filter((_, n) => this.right(n)).length);
+  get total() {
+    return this.questions().length;
+  }
+  done = computed(() => this.result() !== null);
+  corrections = computed(() => this.result()?.corrections ?? []);
+  q = computed(() => this.questions()[this.i()]);
+  score = computed(() => this.result()?.score ?? 0);
   message = computed(() => {
     const r = this.score() / this.total;
     return r >= 0.8 ? '¡Muy bien!' : r >= 0.5 ? 'Buen intento' : 'Sigue practicando';
@@ -152,8 +155,15 @@ export class QuizzPlay {
     afterNextRender(() => this.dlg().nativeElement.showModal());
   }
 
+  ngOnInit() {
+    this.service.get(this.id()).subscribe({
+      next: (q) => this.questions.set(q.questions),
+      error: () => this.error.set('No se pudo cargar el cuestionario'),
+    });
+  }
+
   right(n: number) {
-    return this.answers()[n] === this.questions[n].correct;
+    return this.answers()[n] === this.corrections()[n]?.correctIndex;
   }
 
   pick(o: number) {
@@ -162,8 +172,13 @@ export class QuizzPlay {
 
   next() {
     if (this.i() < this.total - 1) return this.i.update((n) => n + 1);
-    this.done.set(true);
-    this.finished.emit({ score: this.score(), total: this.total });
+    this.service.submit(this.id(), this.answers()).subscribe({
+      next: (r) => {
+        this.result.set(r);
+        this.finished.emit();
+      },
+      error: () => this.error.set('No se pudo enviar el cuestionario'),
+    });
   }
 
   toggle(n: number) {
@@ -178,6 +193,6 @@ export class QuizzPlay {
     this.i.set(0);
     this.answers.set([]);
     this.open.set(new Set());
-    this.done.set(false);
+    this.result.set(null);
   }
 }

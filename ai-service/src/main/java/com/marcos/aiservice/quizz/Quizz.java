@@ -34,6 +34,16 @@ class Quizz {
     @Column(nullable = false)
     private UUID userId;
 
+    @Column(nullable = false)
+    private int requestedQuestions;
+
+    @Column(nullable = false)
+    private int options;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Difficulty difficulty;
+
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,8 +58,11 @@ class Quizz {
     @Column(nullable = false)
     private List<GeneratedQuestion> questions = new ArrayList<>();
 
-    Quizz(UUID fileId, UUID userId) {
+    Quizz(UUID fileId, UUID userId, int requestedQuestions, int options, Difficulty difficulty) {
         this.fileId = fileId;
         this.userId = userId;
+        this.requestedQuestions = requestedQuestions;
+        this.options = options;
+        this.difficulty = difficulty;
     }
 }
