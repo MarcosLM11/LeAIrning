@@ -23,3 +23,9 @@ Single centered column (max 380px) on bg. Small wordmark "LeAIrning" (text + tin
 ## Fields (match backend)
 - Login: identifier (email or username), password
 - Register: name, username, email, password (min 8 chars, show hint)
+
+## App shell (authenticated area)
+- Left sidebar 240px, surface bg, 1px right border: wordmark (birrete icon + LeAIrning) at top, nav items (Inicio, Documentos, Chat, Cuestionarios) as 36px rows with 18px monoline icons, active row = subtle bg #F0F0F0 (dark #1C1C1C) with ink text; user row at bottom (initials avatar + name) and a sun/moon theme toggle.
+- Main area on bg #FAFAFA, content max-width 960px, 32px padding. Page title 24/600.
+- Cards: surface, 1px border, radius 16px, no shadow. Status chips: 12px text, radius 6px, neutral bg; "Listo" uses success tint only for the status dot.
+- Logo mark: graduation cap (filled indigo diamond, curved base line, vertical tassel line) with a small 4-point spark at top right, indigo #4F46E5.

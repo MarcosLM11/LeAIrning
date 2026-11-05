@@ -1,9 +1,7 @@
 @import 'tailwindcss';
 
 :root { --app: #fafafa; --card: #fff; --line: #e5e5e5; --ink: #0a0a0a; --mute: #737373; --brand: #4f46e5; --brand-hover: #4338ca; }
-@media (prefers-color-scheme: dark) {
-  :root { --app: #0a0a0a; --card: #141414; --line: #262626; --ink: #fafafa; --mute: #a3a3a3; --brand: #6366f1; --brand-hover: #4f46e5; }
-}
+[data-theme='dark'] { --app: #0a0a0a; --card: #141414; --line: #262626; --ink: #fafafa; --mute: #a3a3a3; --brand: #6366f1; --brand-hover: #4f46e5; }
 @theme inline {
   --color-app: var(--app); --color-card: var(--card); --color-line: var(--line);
   --color-ink: var(--ink); --color-mute: var(--mute); --color-brand: var(--brand); --color-brand-hover: var(--brand-hover);
