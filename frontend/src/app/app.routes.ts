@@ -9,8 +9,9 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
       { path: 'documents', loadComponent: () => import('./documents/documents').then((m) => m.Documents) },
+      { path: 'chat', loadComponent: () => import('./chat/chat').then((m) => m.Chat) },
       // Secciones vacías por ahora.
-      ...['chat', 'quizzes'].map((path) => ({
+      ...['quizzes'].map((path) => ({
         path,
         loadComponent: () => import('./shell/empty').then((m) => m.Empty),
       })),
