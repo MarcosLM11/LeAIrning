@@ -22,6 +22,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+    hikari:
+      data-source-properties:
+        reWriteBatchedInserts: true
+        socketTimeout: 30
+        ApplicationName: user-service
   jpa:
     open-in-view: false
     hibernate:
