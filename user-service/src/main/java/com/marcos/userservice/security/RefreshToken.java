@@ -6,6 +6,8 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "refresh_tokens")
@@ -14,9 +16,14 @@ import lombok.NoArgsConstructor;
 class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Version
+    private Long version;
+
+    @NaturalId
     @Column(nullable = false, unique = true)
     private String tokenHash;
 

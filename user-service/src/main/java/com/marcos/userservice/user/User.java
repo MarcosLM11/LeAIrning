@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "users")
@@ -15,9 +17,14 @@ import org.hibernate.annotations.CreationTimestamp;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Version
+    private Long version;
+
+    @NaturalId
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -30,6 +37,7 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(length = 50)
     private String avatarContentType;
 
     @Enumerated(EnumType.STRING)

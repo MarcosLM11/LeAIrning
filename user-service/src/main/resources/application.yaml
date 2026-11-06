@@ -31,6 +31,14 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        log_slow_query: 500
+        generate_statistics: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
 
 s3:
   endpoint: http://localhost:9000
