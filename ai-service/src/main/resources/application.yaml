@@ -6,8 +6,6 @@ server:
 spring:
   application:
     name: ai-service
-  profiles:
-    active: dev
   data:
     web:
       pageable:

@@ -27,3 +27,4 @@ xtest-files/
 .playwright-mcp/
 .superdesign/
 design/
+.idea/
