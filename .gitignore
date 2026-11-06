@@ -28,3 +28,4 @@ xtest-files/
 .superdesign/
 design/
 .idea/
+.env
