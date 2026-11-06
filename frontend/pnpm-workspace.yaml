@@ -1,0 +1,6 @@
+# pnpm 12 bloquea por defecto los scripts de instalación; estos son los binarios nativos que necesita Angular.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
