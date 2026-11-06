@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 class SecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) {
         var authorities = new JwtGrantedAuthoritiesConverter();
         authorities.setAuthoritiesClaimName("roles");
         authorities.setAuthorityPrefix("ROLE_");
@@ -31,7 +31,6 @@ class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/bootui", "/bootui/**").permitAll()
                         .requestMatchers("/actuator/health/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o.jwt(j -> j.jwtAuthenticationConverter(converter)))

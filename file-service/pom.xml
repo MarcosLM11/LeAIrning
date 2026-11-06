@@ -21,6 +21,7 @@
         <lz4.version>1.11.4</lz4.version>
         <snappy.version>1.1.10.9</snappy.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <!-- Transitive via kafka-clients; pinned to fixed versions (GHSA advisories) -->
@@ -137,20 +138,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.julien-dubois.bootui</groupId>
-            <artifactId>bootui-spring-boot-starter</artifactId>
-            <version>2.3.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
