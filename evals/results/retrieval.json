@@ -1,0 +1,76 @@
+{
+  "embeddingModel" : "text-embedding-3-small",
+  "chunks" : 188,
+  "questions" : 21,
+  "recall@1" : 0.571,
+  "recall@3" : 0.81,
+  "recall@5" : 0.905,
+  "recall@10" : 0.905,
+  "mrr@10" : 0.704,
+  "recall@4 threshold 0.3" : 0.857,
+  "unreachable" : [ ],
+  "perQuestion" : [ {
+    "rank" : 1,
+    "id" : "q001"
+  }, {
+    "rank" : 1,
+    "id" : "q002"
+  }, {
+    "rank" : 1,
+    "id" : "q003"
+  }, {
+    "rank" : 1,
+    "id" : "q004"
+  }, {
+    "rank" : 0,
+    "id" : "q005"
+  }, {
+    "rank" : 2,
+    "id" : "q006"
+  }, {
+    "rank" : 1,
+    "id" : "q007"
+  }, {
+    "rank" : 1,
+    "id" : "q008"
+  }, {
+    "rank" : 1,
+    "id" : "q009"
+  }, {
+    "rank" : 2,
+    "id" : "q010"
+  }, {
+    "rank" : 4,
+    "id" : "q011"
+  }, {
+    "rank" : 1,
+    "id" : "q012"
+  }, {
+    "rank" : 2,
+    "id" : "q013"
+  }, {
+    "rank" : 1,
+    "id" : "q014"
+  }, {
+    "rank" : 0,
+    "id" : "q015"
+  }, {
+    "rank" : 1,
+    "id" : "q016"
+  }, {
+    "rank" : 3,
+    "id" : "q017"
+  }, {
+    "rank" : 5,
+    "id" : "q018"
+  }, {
+    "rank" : 2,
+    "id" : "q019"
+  }, {
+    "rank" : 1,
+    "id" : "q020"
+  }, {
+    "rank" : 1,
+    "id" : "q021"
+  } ]
+}
