@@ -1,5 +1,7 @@
 server:
   port: 8082
+  compression:
+    enabled: true
 
 spring:
   application:
@@ -11,6 +13,15 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  web:
+    error:
+      include-stacktrace: never
+      include-message: never
+      include-binding-errors: never
+  data:
+    web:
+      pageable:
+        max-page-size: 100
   mvc:
     problemdetails:
       enabled: true
@@ -18,6 +29,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+    hikari:
+      data-source-properties:
+        reWriteBatchedInserts: true
+        socketTimeout: 30
+        ApplicationName: file-service
   kafka:
     consumer:
       group-id: file-service
@@ -30,11 +46,22 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
       properties:
         spring.json.add.type.headers: false
+  flyway:
+    table: flyway_schema_history_file
+    baseline-on-migrate: true
+    baseline-version: 0
   jpa:
     open-in-view: false
     hibernate:
-      # shortcut: auto schema updates, switch to Flyway/Liquibase before production data matters.
-      ddl-auto: update
+      ddl-auto: validate
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        log_slow_query: 500
+        generate_statistics: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
 
 s3:
   endpoint: http://localhost:9000

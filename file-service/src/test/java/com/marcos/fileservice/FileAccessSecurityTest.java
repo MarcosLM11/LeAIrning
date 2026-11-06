@@ -61,9 +61,28 @@ class FileAccessSecurityTest {
         mvc.perform(get("/api/v1/files")).andExpect(status().isUnauthorized());
         mvc.perform(get("/api/v1/files").with(user(owner, "ROLE_USER")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").value(mine.toString()))
-                .andExpect(jsonPath("$[0].name").value("mine.txt"));
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(mine.toString()))
+                .andExpect(jsonPath("$.content[0].name").value("mine.txt"));
+    }
+
+    @Test
+    void listFiltersByNameTypeAndPaginates() throws Exception {
+        var me = UUID.randomUUID();
+        repository.save(new FileMetadata("Biologia.pdf", "application/pdf", 1, me));
+        repository.save(new FileMetadata("Notas_100%.md", "text/markdown", 1, me));
+        repository.save(new FileMetadata("Fisica.pdf", "application/pdf", 1, me));
+
+        mvc.perform(get("/api/v1/files").param("name", "bio").with(user(me, "ROLE_USER")))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Biologia.pdf"));
+        mvc.perform(get("/api/v1/files").param("type", "PDF").with(user(me, "ROLE_USER")))
+                .andExpect(jsonPath("$.page.totalElements").value(2));
+        mvc.perform(get("/api/v1/files").param("name", "%").with(user(me, "ROLE_USER")))
+                .andExpect(jsonPath("$.page.totalElements").value(1));
+        mvc.perform(get("/api/v1/files").param("size", "2").param("page", "1").with(user(me, "ROLE_USER")))
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.page.totalPages").value(2));
     }
 
     private static RequestPostProcessor user(UUID id, String role) {

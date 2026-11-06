@@ -2,9 +2,13 @@ package com.marcos.fileservice;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.util.UUID;
 import com.marcos.fileservice.storage.S3Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -39,7 +43,7 @@ public class FileService {
             s3.upload(key.toString(), upload.getInputStream(), length, contentType);
         } catch (IOException e) {
             markFailed(file);
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         } catch (RuntimeException e) {
             markFailed(file);
             throw e;
@@ -62,8 +66,22 @@ public class FileService {
         repository.save(file);
     }
 
-    List<FileResponse> list(UUID ownerId) {
-        return repository.findByOwnerId(ownerId).stream().map(FileResponse::from).toList();
+    Page<FileResponse> list(UUID ownerId, String name, String type, Instant since, Pageable pageable) {
+        Specification<FileMetadata> spec = (f, _, cb) -> cb.equal(f.get("ownerId"), ownerId);
+        if (name != null && !name.isBlank()) {
+            spec = spec.and((f, _, cb) -> cb.like(cb.lower(f.get("name")), "%" + like(name) + "%", '\\'));
+        }
+        if (type != null && !type.isBlank()) {
+            spec = spec.and((f, _, cb) -> cb.like(cb.lower(f.get("name")), "%." + like(type), '\\'));
+        }
+        if (since != null) {
+            spec = spec.and((f, _, cb) -> cb.greaterThanOrEqualTo(f.<Instant>get("uploadedAt"), since));
+        }
+        return repository.findAll(spec, pageable).map(FileResponse::from);
+    }
+
+    private static String like(String s) {
+        return s.trim().toLowerCase().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     public boolean isOwner(UUID key, String userId) {
@@ -86,7 +104,6 @@ public class FileService {
         kafka.send(FILE_DELETED_TOPIC, key.toString(), new FileDeletedEvent(key));
     }
 
-    // UPLOADED -> READY once ingestion has indexed the file, FAILED otherwise. Ignored if the file was deleted meanwhile.
     void markIngested(UUID key, boolean success) {
         repository.findById(key).ifPresent(f -> {
             f.setStatus(success ? FileStatus.READY : FileStatus.FAILED);

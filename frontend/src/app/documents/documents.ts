@@ -1,11 +1,12 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DocumentCard } from './document-card';
 import { DocumentModal } from './document-modal';
 import { Doc, DocumentsService } from './documents.service';
-import { TYPE_KEYS, typeOf } from './file-type';
+import { TYPE_KEYS } from './file-type';
 
 const DAY = 86_400_000;
+const PAGE_SIZE = 12;
 
 const RANGES = [
   { label: 'Fecha: Cualquiera', days: 0 },
@@ -52,12 +53,20 @@ const RANGES = [
       <select class="input select !w-auto" [(ngModel)]="days">
         @for (r of ranges; track r.days) { <option [ngValue]="r.days">{{ r.label }}</option> }
       </select>
-      <span class="ml-auto text-[13px] text-mute">{{ shown().length }} documentos</span>
+      <span class="ml-auto text-[13px] text-mute">{{ total() }} documentos</span>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      @for (d of shown(); track d.id) { <app-document-card [doc]="d" (open)="selected.set(d)" (remove)="remove(d)" /> }
+      @for (d of docs(); track d.id) { <app-document-card [doc]="d" (open)="selected.set(d)" (remove)="remove(d)" /> }
     </div>
+
+    @if (totalPages() > 1) {
+      <nav class="mt-6 flex items-center justify-center gap-4 text-[13px]">
+        <button class="btn !w-auto px-3" [disabled]="pageIndex() === 0" (click)="go(pageIndex() - 1)">Anterior</button>
+        <span class="text-mute">Página {{ pageIndex() + 1 }} de {{ totalPages() }}</span>
+        <button class="btn !w-auto px-3" [disabled]="pageIndex() + 1 >= totalPages()" (click)="go(pageIndex() + 1)">Siguiente</button>
+      </nav>
+    }
 
     @if (selected(); as d) {
       <app-document-modal [doc]="d" (closed)="selected.set(null)" (remove)="remove(d)" />
@@ -77,19 +86,41 @@ export class Documents {
   type = signal('');
   days = signal(0);
 
-  shown = computed(() => {
-    const q = this.search().toLowerCase(), t = this.type(), since = Date.now() - this.days() * DAY;
-    return this.docs().filter(
-      (d) => d.name.toLowerCase().includes(q) && (!t || typeOf(d.name).ext === t) && (!this.days() || Date.parse(d.uploadedAt) >= since),
-    );
-  });
+  pageIndex = signal(0);
+  totalPages = signal(0);
+  total = signal(0);
+  private timer?: ReturnType<typeof setTimeout>;
 
   constructor() {
-    this.load();
+    // any filter change goes back to the first page; the search text is debounced
+    effect(() => {
+      this.search(); this.type(); this.days();
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => { this.pageIndex.set(0); this.load(); }, 300);
+    });
   }
 
   load() {
-    this.service.list().subscribe((docs) => this.docs.set([...docs].sort((a, b) => b.uploadedAt.localeCompare(a.uploadedAt))));
+    this.service
+      .page({
+        page: this.pageIndex(),
+        size: PAGE_SIZE,
+        name: this.search().trim(),
+        type: this.type(),
+        since: this.days() ? new Date(Date.now() - this.days() * DAY).toISOString() : undefined,
+      })
+      .subscribe((p) => {
+        // the last item of the last page was removed: step back one page
+        if (!p.content.length && this.pageIndex() > 0) { this.pageIndex.update((i) => i - 1); this.load(); return; }
+        this.docs.set(p.content);
+        this.total.set(p.page.totalElements);
+        this.totalPages.set(p.page.totalPages);
+      });
+  }
+
+  go(i: number) {
+    this.pageIndex.set(i);
+    this.load();
   }
 
   remove(d: Doc) {

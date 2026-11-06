@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,8 +18,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 class FileMetadata {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
+
+    @Version
+    private Long version;
 
     @Column(nullable = false)
     private String name;
@@ -28,7 +33,6 @@ class FileMetadata {
 
     private long size;
 
-    // nullable: files uploaded before ownership existed have no owner (only ADMIN can reach them)
     @Column(updatable = false)
     private UUID ownerId;
 

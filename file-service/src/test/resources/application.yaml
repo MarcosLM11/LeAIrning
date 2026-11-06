@@ -1,9 +1,21 @@
 spring:
   application:
     name: file-service
+  kafka:
+    consumer:
+      group-id: file-service
+      auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.value.default.type: com.marcos.fileservice.FileIngestedEvent
+        spring.json.use.type.headers: false
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
 
 management:
   otlp:

@@ -1,8 +1,12 @@
 package com.marcos.fileservice;
 
-import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +38,14 @@ class FileController {
     }
 
     @GetMapping
-    List<FileResponse> list(Authentication auth) {
-        return service.list(userId(auth));
+    Page<FileResponse> list(
+            Authentication auth,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Instant since,
+            @PageableDefault(size = 20, sort = "uploadedAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return service.list(userId(auth), name, type, since, pageable);
     }
 
     @GetMapping("/{key}")
@@ -54,7 +64,6 @@ class FileController {
         return ResponseEntity.noContent().build();
     }
 
-    // the JWT subject is the user id (see user-service)
     private static UUID userId(Authentication auth) {
         return UUID.fromString(auth.getName());
     }
