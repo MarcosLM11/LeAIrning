@@ -32,10 +32,13 @@ spring:
         reWriteBatchedInserts: true
         socketTimeout: 30
         ApplicationName: user-service
+  flyway:
+    table: flyway_schema_history_user
+    baseline-on-migrate: true
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         order_inserts: true
