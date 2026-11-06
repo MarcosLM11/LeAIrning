@@ -1,19 +1,46 @@
 server:
   port: 8081
+  compression:
+    enabled: true
 
 spring:
   application:
     name: ai-service
   profiles:
     active: dev
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+  threads:
+    virtual:
+      enabled: true
+  web:
+    error:
+      include-stacktrace: never
+      include-message: never
+      include-binding-errors: never
   datasource:
     url: jdbc:postgresql://localhost:5432/fileservice
     username: postgres
     password: postgres
+    hikari:
+      data-source-properties:
+        reWriteBatchedInserts: true
+        socketTimeout: 30
+        ApplicationName: ai-service
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        log_slow_query: 500
+        generate_statistics: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer

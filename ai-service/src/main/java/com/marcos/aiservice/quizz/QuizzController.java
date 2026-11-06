@@ -1,9 +1,14 @@
 package com.marcos.aiservice.quizz;
 
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.Authentication;
@@ -17,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/quizz")
+@RequestMapping("api/v1/quizzes")
 @RequiredArgsConstructor
 public class QuizzController {
 
@@ -34,8 +39,11 @@ public class QuizzController {
     }
 
     @GetMapping
-    public List<QuizzSummary> list(Authentication auth) {
-        return quizzService.list(userId(auth));
+    public Page<QuizzSummary> list(
+            Authentication auth,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return quizzService.list(userId(auth), pageable);
     }
 
     @GetMapping("/{id}")
@@ -49,8 +57,8 @@ public class QuizzController {
         quizzService.retry(UUID.fromString(jwt.getSubject()), jwt.getClaimAsString("email"), id);
     }
 
-    @PostMapping("/{id}/attempts")
-    public AttemptResult submit(@PathVariable UUID id, @RequestBody AttemptRequest request, Authentication auth) {
+    @PostMapping(value = "/{id}/attempts", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public AttemptResult submit(@PathVariable UUID id, @Valid @RequestBody AttemptRequest request, Authentication auth) {
         return quizzService.submit(userId(auth), id, request.answers());
     }
 

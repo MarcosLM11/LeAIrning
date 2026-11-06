@@ -4,6 +4,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.marcos.aiservice.security.SecurityConfig;
@@ -36,7 +37,7 @@ class QuizzAttemptsControllerTest {
         given(quizzService.submit(userId, quizzId, List.of(1, 0))).willReturn(new AttemptResult(1, 2,
                 List.of(new AttemptResult.Correction(1, "why"), new AttemptResult.Correction(2, null))));
 
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/attempts").with(jwt().jwt(j -> j.subject(userId.toString())))
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/attempts").with(jwt().jwt(j -> j.subject(userId.toString())))
                         .contentType(MediaType.APPLICATION_JSON).content("{\"answers\":[1,0]}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.score").value(1))
@@ -51,14 +52,25 @@ class QuizzAttemptsControllerTest {
         given(quizzService.submit(userId, quizzId, List.of(0)))
                 .willThrow(new ResponseStatusException(CONFLICT, "Quizz is not ready"));
 
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/attempts").with(jwt().jwt(j -> j.subject(userId.toString())))
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/attempts").with(jwt().jwt(j -> j.subject(userId.toString())))
                         .contentType(MediaType.APPLICATION_JSON).content("{\"answers\":[0]}"))
                 .andExpect(status().isConflict());
     }
 
     @Test
+    void missingAnswersIsAProblemDetail() throws Exception {
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/attempts").with(jwt().jwt(j -> j.subject(userId.toString())))
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Invalid request"))
+                .andExpect(jsonPath("$.errors.answers").exists());
+    }
+
+    @Test
     void withoutTokenIsUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/attempts")
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/attempts")
                         .contentType(MediaType.APPLICATION_JSON).content("{\"answers\":[0]}"))
                 .andExpect(status().isUnauthorized());
     }

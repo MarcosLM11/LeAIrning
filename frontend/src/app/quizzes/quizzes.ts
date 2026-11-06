@@ -6,6 +6,8 @@ import { QuizzModal } from './quizz-modal';
 import { QuizzPlay } from './quizz-play';
 import { DIFFICULTIES, QuizzParams, QuizzStatus, QuizzSummary, QuizzesService } from './quizzes.service';
 
+const PAGE_SIZE = 12;
+
 const LABEL = Object.fromEntries(DIFFICULTIES.map((d) => [d.key, d.label]));
 
 const ICON = 'fill-none stroke-current stroke-2 [stroke-linecap:round] [stroke-linejoin:round]';
@@ -59,6 +61,14 @@ const BADGE: Record<QuizzStatus, { label: string; cls: string }> = {
       }
     </div>
 
+    @if (totalPages() > 1) {
+      <nav class="mt-6 flex items-center justify-center gap-4 text-[13px]">
+        <button class="btn !w-auto px-3" [disabled]="pageIndex() === 0" (click)="go(pageIndex() - 1)">Anterior</button>
+        <span class="text-mute">Página {{ pageIndex() + 1 }} de {{ totalPages() }}</span>
+        <button class="btn !w-auto px-3" [disabled]="pageIndex() + 1 >= totalPages()" (click)="go(pageIndex() + 1)">Siguiente</button>
+      </nav>
+    }
+
     @if (play(); as q) {
       <app-quizz-play [id]="q.id" [doc]="name(q)" [difficulty]="label[q.difficulty]" (closed)="play.set(null)" (finished)="load()" />
     }
@@ -77,6 +87,8 @@ export class Quizzes {
   error = signal('');
   play = signal<QuizzSummary | null>(null);
   quizzes = signal<QuizzSummary[]>([]);
+  pageIndex = signal(0);
+  totalPages = signal(0);
   private files = signal(new Map<string, string>());
 
   constructor() {
@@ -92,10 +104,18 @@ export class Quizzes {
   // Reloads the list; while something is still generating it polls every 5 s.
   load() {
     clearTimeout(this.timer);
-    this.service.list().subscribe((l) => {
-      this.quizzes.set(l);
-      if (l.some((q) => q.status === 'PENDING')) this.timer = setTimeout(() => this.load(), 5000);
+    this.service.list(this.pageIndex(), PAGE_SIZE).subscribe((p) => {
+      // the last item of the last page was removed: step back one page
+      if (!p.content.length && this.pageIndex() > 0) { this.pageIndex.update((i) => i - 1); this.load(); return; }
+      this.quizzes.set(p.content);
+      this.totalPages.set(p.page.totalPages);
+      if (p.content.some((q) => q.status === 'PENDING')) this.timer = setTimeout(() => this.load(), 5000);
     });
+  }
+
+  go(i: number) {
+    this.pageIndex.set(i);
+    this.load();
   }
 
   retry(q: QuizzSummary) {

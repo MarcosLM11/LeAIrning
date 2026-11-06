@@ -31,7 +31,7 @@ class QuizzRetryControllerTest {
 
     @Test
     void acceptsAndPassesUserEmailAndId() throws Exception {
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/retry")
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/retry")
                         .with(jwt().jwt(j -> j.subject(userId.toString()).claim("email", "a@a.com"))))
                 .andExpect(status().isAccepted());
 
@@ -43,13 +43,13 @@ class QuizzRetryControllerTest {
         willThrow(new ResponseStatusException(CONFLICT, "Only failed quizzes can be retried"))
                 .given(quizzService).retry(userId, "a@a.com", quizzId);
 
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/retry")
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/retry")
                         .with(jwt().jwt(j -> j.subject(userId.toString()).claim("email", "a@a.com"))))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void withoutTokenIsUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/v1/quizz/" + quizzId + "/retry")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/quizzes/" + quizzId + "/retry")).andExpect(status().isUnauthorized());
     }
 }

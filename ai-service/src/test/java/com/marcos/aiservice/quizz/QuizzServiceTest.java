@@ -7,11 +7,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import static org.mockito.ArgumentMatchers.eq;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -59,9 +62,9 @@ class QuizzServiceTest {
     @Test
     void listReturnsSummariesOfTheUser() {
         var quizz = pendingQuizz();
-        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+        when(repository.findByUserId(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(quizz)));
 
-        assertThat(service.list(userId)).extracting(QuizzSummary::id, QuizzSummary::questions, QuizzSummary::difficulty)
+        assertThat(service.list(userId, PageRequest.of(0, 20))).extracting(QuizzSummary::id, QuizzSummary::questions, QuizzSummary::difficulty)
                 .containsExactly(tuple(id, 5, Difficulty.FACIL));
     }
 
@@ -113,21 +116,21 @@ class QuizzServiceTest {
     @Test
     void listCountsGeneratedQuestionsOnceReady() {
         var quizz = readyQuizz(); // requested 5, the model produced 2
-        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+        when(repository.findByUserId(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(quizz)));
 
-        assertThat(service.list(userId)).extracting(QuizzSummary::questions).containsExactly(2);
+        assertThat(service.list(userId, PageRequest.of(0, 20))).extracting(QuizzSummary::questions).containsExactly(2);
     }
 
     @Test
     void listShowsLatestScore() {
         var quizz = pendingQuizz();
-        when(repository.findByUserIdOrderByCreatedAtDesc(userId)).thenReturn(List.of(quizz));
+        when(repository.findByUserId(eq(userId), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(quizz)));
         var latest = mock(AttemptRepository.LatestScore.class);
         when(latest.getQuizzId()).thenReturn(id);
         when(latest.getScore()).thenReturn(3);
         when(attempts.findLatestScores(userId)).thenReturn(List.of(latest));
 
-        assertThat(service.list(userId)).extracting(QuizzSummary::score).containsExactly(3);
+        assertThat(service.list(userId, PageRequest.of(0, 20))).extracting(QuizzSummary::score).containsExactly(3);
     }
 
     @Test

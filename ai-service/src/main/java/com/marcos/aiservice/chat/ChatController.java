@@ -1,6 +1,7 @@
 package com.marcos.aiservice.chat;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
     public String chat(
             @RequestBody String question, @RequestParam(defaultValue = "default") String conversationId,
             @RequestParam(defaultValue = "") List<UUID> fileIds, Authentication auth
@@ -23,7 +24,7 @@ public class ChatController {
         return chatService.ask(question, conversationId, userId(auth), fileIds);
     }
 
-    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/stream", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> stream(
             @RequestBody String question, @RequestParam(defaultValue = "default") String conversationId,
             @RequestParam(defaultValue = "") List<UUID> fileIds, Authentication auth
@@ -31,17 +32,18 @@ public class ChatController {
         return chatService.stream(question, conversationId, userId(auth), fileIds);
     }
 
-    @GetMapping("/conversations")
+    @GetMapping(value = "/conversations", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ConversationView> conversations(Authentication auth) {
         return chatService.conversations(userId(auth));
     }
 
-    @GetMapping("/history")
+    @GetMapping(value = "/history", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MessageView> history(@RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
         return chatService.history(conversationId, userId(auth));
     }
 
     @DeleteMapping("/history")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearHistory(@RequestParam(defaultValue = "default") String conversationId, Authentication auth) {
         chatService.clearHistory(conversationId, userId(auth));
     }

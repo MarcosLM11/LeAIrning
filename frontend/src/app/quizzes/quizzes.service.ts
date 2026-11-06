@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { API } from '../api';
+import { Page } from '../page';
 
 export type Difficulty = 'FACIL' | 'MEDIO' | 'DIFICIL';
 export type QuizzStatus = 'PENDING' | 'READY' | 'FAILED';
@@ -44,23 +45,23 @@ export interface QuizzParams {
 export class QuizzesService {
   private http = inject(HttpClient);
 
-  list() {
-    return this.http.get<QuizzSummary[]>(`${API}/quizz`);
+  list(page: number, size: number) {
+    return this.http.get<Page<QuizzSummary>>(`${API}/quizzes`, { params: { page, size } });
   }
 
   create({ fileId, ...params }: QuizzParams) {
-    return this.http.post<string>(`${API}/quizz/${fileId}`, null, { params });
+    return this.http.post<string>(`${API}/quizzes/${fileId}`, null, { params });
   }
 
   get(id: string) {
-    return this.http.get<{ questions: Question[] }>(`${API}/quizz/${id}`);
+    return this.http.get<{ questions: Question[] }>(`${API}/quizzes/${id}`);
   }
 
   retry(id: string) {
-    return this.http.post<void>(`${API}/quizz/${id}/retry`, null);
+    return this.http.post<void>(`${API}/quizzes/${id}/retry`, null);
   }
 
   submit(id: string, answers: number[]) {
-    return this.http.post<AttemptResult>(`${API}/quizz/${id}/attempts`, { answers });
+    return this.http.post<AttemptResult>(`${API}/quizzes/${id}/attempts`, { answers });
   }
 }

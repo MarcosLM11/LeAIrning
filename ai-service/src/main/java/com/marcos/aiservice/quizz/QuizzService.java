@@ -7,6 +7,8 @@ import static java.util.stream.Collectors.toMap;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,12 +48,11 @@ public class QuizzService {
                 q.getRequestedQuestions(), q.getOptions(), q.getDifficulty()));
     }
 
-    public List<QuizzSummary> list(UUID userId) {
-        var scores = attempts.findLatestScores(userId).stream()
-                .collect(toMap(AttemptRepository.LatestScore::getQuizzId, AttemptRepository.LatestScore::getScore, (a, b) -> a));
-        return repository.findByUserIdOrderByCreatedAtDesc(userId).stream()
-                .map(q -> QuizzSummary.of(q, scores.get(q.getId())))
-                .toList();
+    public Page<QuizzSummary> list(UUID userId, Pageable pageable) {
+        var scores = attempts.findLatestScores(userId)
+                .stream()
+                .collect(toMap(AttemptRepository.LatestScore::getQuizzId, AttemptRepository.LatestScore::getScore, (a, _) -> a));
+        return repository.findByUserId(userId, pageable).map(q -> QuizzSummary.of(q, scores.get(q.getId())));
     }
 
     public QuizzView get(UUID userId, UUID id) {
