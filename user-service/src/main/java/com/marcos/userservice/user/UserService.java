@@ -2,10 +2,11 @@ package com.marcos.userservice.user;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,8 @@ class UserService {
         return UserResponse.from(find(id));
     }
 
-    List<UserResponse> list() {
-        return repository.findAll().stream().map(UserResponse::from).toList();
+    Page<UserResponse> list(Pageable pageable) {
+        return repository.findAll(pageable).map(UserResponse::from);
     }
 
     @Transactional

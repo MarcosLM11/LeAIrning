@@ -1,10 +1,12 @@
 package com.marcos.userservice.user;
 
-import java.util.List;
+import java.net.URI;
 import java.util.UUID;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,10 +23,10 @@ class UserController {
 
     private final UserService service;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    UserResponse create(@Valid @RequestBody CreateUserRequest r) {
-        return service.create(r);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest r) {
+        var user = service.create(r);
+        return ResponseEntity.created(URI.create("/api/v1/users/" + user.id())).body(user);
     }
 
     @GetMapping("/me")
@@ -40,11 +42,11 @@ class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    List<UserResponse> list() {
-        return service.list();
+    Page<UserResponse> list(Pageable pageable) {
+        return service.list(pageable);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.name")
     UserResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest r) {
         return service.update(id, r);
