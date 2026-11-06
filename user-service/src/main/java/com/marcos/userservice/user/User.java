@@ -2,7 +2,6 @@ package com.marcos.userservice.user;
 
 import java.time.Instant;
 import java.util.UUID;
-import com.marcos.userservice.security.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
