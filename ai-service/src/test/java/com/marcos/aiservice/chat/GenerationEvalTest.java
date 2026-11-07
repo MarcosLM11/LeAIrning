@@ -158,7 +158,7 @@ class GenerationEvalTest {
                 .build();
 
         int answerableRuns = 0, answered = 0, faithful = 0, correct = 0, falseAbstained = 0;
-        int unanswerableRuns = 0, abstained = 0, noContext = 0;
+        int unanswerableRuns = 0, abstained = 0, noContext = 0, goldInContext = 0, emptyContext = 0;
         var details = new ArrayList<Map<String, Object>>();
         var perQuestion = new ArrayList<Map<String, Object>>();
 
@@ -167,6 +167,8 @@ class GenerationEvalTest {
             var id = q.get("id").asString();
             var question = q.get("question").asString();
             boolean answerable = "answerable".equals(q.get("type").asString());
+            var golds = new ArrayList<String>();
+            if (answerable) q.get("gold_passages").forEach(g -> golds.add(norm(g.asString())));
             int qCorrect = 0, qAbstained = 0;
 
             for (int run = 1; run <= RUNS; run++) {
@@ -174,6 +176,11 @@ class GenerationEvalTest {
                 var answer = chatService.ask(question, UUID.randomUUID().toString(), userId, List.of());
                 var context = recorder.last.get();
                 if (context == null) noContext++;
+                int contextChunks = context == null ? 0 : context.size();
+                // Did the model see a passage that answers the question? Same matching as the retrieval eval.
+                boolean hasGold = answerable && context != null && context.stream().anyMatch(d ->
+                        q.get("doc").asString().equals(d.getMetadata().get("filename"))
+                                && golds.stream().anyMatch(norm(d.getText())::contains));
 
                 Verdict v;
                 if (answerable) {
@@ -181,6 +188,7 @@ class GenerationEvalTest {
                             : context.stream().map(Document::getText).collect(Collectors.joining("\n---\n"));
                     v = grade(judge, ANSWERABLE_PROMPT.formatted(question, q.get("answer").asString(), ctx, answer));
                     answerableRuns++;
+                    if (hasGold) goldInContext++;
                     if (v.abstained()) falseAbstained++;
                     else {
                         answered++;
@@ -190,9 +198,10 @@ class GenerationEvalTest {
                 } else {
                     v = grade(judge, UNANSWERABLE_PROMPT.formatted(question, answer));
                     unanswerableRuns++;
+                    if (contextChunks == 0) emptyContext++;
                     if (v.abstained()) { abstained++; qAbstained++; }
                 }
-                details.add(detail(id, run, answer, v));
+                details.add(detail(id, run, answer, v, contextChunks, answerable ? hasGold : null));
             }
             perQuestion.add(answerable
                     ? Map.of("id", id, "correctRuns", qCorrect, "runs", RUNS)
@@ -210,6 +219,8 @@ class GenerationEvalTest {
         summary.put("correctness", ratio(correct, answerableRuns));
         summary.put("falseAbstention", ratio(falseAbstained, answerableRuns));
         summary.put("abstention (unanswerable)", ratio(abstained, unanswerableRuns));
+        summary.put("goldInContext (answerable)", ratio(goldInContext, answerableRuns));
+        summary.put("emptyContext (unanswerable)", ratio(emptyContext, unanswerableRuns));
         summary.put("perQuestion", perQuestion);
 
         Files.createDirectories(EVALS.resolve("results"));
@@ -224,10 +235,12 @@ class GenerationEvalTest {
                 .entity(Verdict.class, spec -> spec.useProviderStructuredOutput().validateSchema());
     }
 
-    private static Map<String, Object> detail(String id, int run, String answer, Verdict v) {
+    private static Map<String, Object> detail(String id, int run, String answer, Verdict v, int contextChunks, Boolean goldInContext) {
         var m = new LinkedHashMap<String, Object>();
         m.put("id", id);
         m.put("run", run);
+        m.put("contextChunks", contextChunks);
+        m.put("goldInContext", goldInContext);
         m.put("answer", norm(answer));
         m.put("abstained", v.abstained());
         m.put("faithful", v.faithful());

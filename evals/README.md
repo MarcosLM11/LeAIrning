@@ -20,4 +20,4 @@ cd ingestion-service && OPENAI_API_KEY=... ./mvnw test -Peval   # evals/results/
 cd ai-service && OPENAI_API_KEY=... ./mvnw test -Peval          # evals/results/generation.json
 ```
 
-`generation.json` has faithfulness (claims supported by the retrieved chunks, over answers that did not abstain), correctness against `answer`, false abstention on answerable questions, and abstention on unanswerable ones. Each question runs 3 times and an LLM judge grades it. `generation-details.json` keeps every answer and verdict so the judge can be spot-checked by hand.
+`generation.json` has faithfulness (claims supported by the retrieved chunks, over answers that did not abstain), correctness against `answer`, false abstention on answerable questions, and abstention on unanswerable ones. Each question runs 3 times and an LLM judge grades it. `generation-details.json` keeps every answer and verdict so the judge can be spot-checked by hand, plus how many chunks the model saw and whether one held a reference passage (`goldInContext`). `goldInContext` only knows the listed `gold_passages`, so a chunk with another valid passage counts as a miss.
