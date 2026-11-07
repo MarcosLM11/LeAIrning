@@ -100,6 +100,26 @@ cd frontend && pnpm test
 
 Cada servicio de backend tiene su propio workflow de GitHub Actions.
 
+## Línea base de calidad
+
+La recuperación y las respuestas se miden con un dataset pequeño y versionado en [evals](evals): tres RFC y 31 preguntas (21 que los documentos responden y 10 que no). Primera línea base, con `text-embedding-3-small` para los embeddings, `gpt-5-nano` como modelo de chat y `gpt-5-mini` como juez:
+
+| Recuperación | |
+|---|---|
+| recall@1 / @3 / @5 / @10 | 0,57 / 0,81 / 0,90 / 0,90 |
+| MRR@10 | 0,70 |
+| recall@4 con el umbral de producción | 0,86 |
+
+| Generación | |
+|---|---|
+| Corrección | 0,97 |
+| Fidelidad (respuestas que no se abstienen) | 0,94 |
+| Abstención en preguntas que los documentos no responden | 0,53 |
+
+Cuando el pasaje que responde llega al modelo, responde bien (54 de 54 ejecuciones). Los puntos débiles son la recuperación, que no encuentra el pasaje en algunas preguntas, y la abstención: el modelo suele responder con conocimiento general en lugar de decir que los documentos no lo cubren.
+
+Las diferencias pequeñas son ruido: una pregunta vale 4,8 puntos y dos ejecuciones idénticas movieron algunos rangos. Los RFC son muy conocidos, así que la corrección está casi saturada. Los resultados en bruto están en [evals/results](evals/results) y cómo ejecutarlos, en [evals/README.md](evals/README.md).
+
 ## Stack
 
 Java 27, Spring Boot, Spring AI, Spring Cloud Gateway, Spring Kafka, Postgres con pgvector, Flyway, almacenamiento compatible con S3 (RustFS), Angular, Tailwind, OpenTelemetry con Grafana LGTM.
@@ -114,7 +134,7 @@ Las versiones originales de los ADRs están en inglés; aquí tienes la traducci
 
 ## Estado
 
-Trabajo en curso. Los servicios dependen de un snapshot de Spring Boot, así que la primera construcción necesita acceso de red a `repo.spring.io`. La calidad de la recuperación y de las respuestas aún no se mide, y los ADRs recogen los huecos de fiabilidad conocidos.
+Trabajo en curso. Los servicios dependen de un snapshot de Spring Boot, así que la primera construcción necesita acceso de red a `repo.spring.io`. La calidad de la recuperación y de las respuestas tiene una primera línea base (ver arriba), y los ADRs recogen los huecos de fiabilidad conocidos.
 
 ## Licencia
 

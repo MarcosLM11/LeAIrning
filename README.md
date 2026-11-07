@@ -100,6 +100,26 @@ cd frontend && pnpm test
 
 Each backend service has its own GitHub Actions workflow.
 
+## Quality baseline
+
+Retrieval and answers are measured against a small versioned dataset in [evals](evals): three RFCs and 31 questions (21 the documents answer, 10 they do not). First baseline, with `text-embedding-3-small` for embeddings, `gpt-5-nano` as the chat model and `gpt-5-mini` as the judge:
+
+| Retrieval | |
+|---|---|
+| recall@1 / @3 / @5 / @10 | 0.57 / 0.81 / 0.90 / 0.90 |
+| MRR@10 | 0.70 |
+| recall@4 with the production threshold | 0.86 |
+
+| Generation | |
+|---|---|
+| Correctness | 0.97 |
+| Faithfulness (answers that did not abstain) | 0.94 |
+| Abstention on questions the documents do not answer | 0.53 |
+
+When the answering passage reaches the model it answers correctly (54 of 54 runs). The weak spots are retrieval, which misses the passage in some questions, and abstention: the model often answers from general knowledge instead of saying the documents do not cover it.
+
+Treat small differences as noise: one question is worth 4.8 points, and two identical runs moved some ranks. The RFCs are well known, so correctness is close to saturated. Raw results are in [evals/results](evals/results); how to run them is in [evals/README.md](evals/README.md).
+
 ## Stack
 
 Java 27, Spring Boot, Spring AI, Spring Cloud Gateway, Spring Kafka, Postgres with pgvector, Flyway, S3-compatible storage (RustFS), Angular, Tailwind, OpenTelemetry with Grafana LGTM.
@@ -114,7 +134,7 @@ Spanish versions are in [docs/adr/es](docs/adr/es).
 
 ## Status
 
-A work in progress. The services depend on a Spring Boot snapshot, so the first build needs network access to `repo.spring.io`. Retrieval and answer quality are not measured yet, and the ADRs list the known reliability gaps.
+A work in progress. The services depend on a Spring Boot snapshot, so the first build needs network access to `repo.spring.io`. Retrieval and answer quality have a first baseline (see above), and the ADRs list the known reliability gaps.
 
 ## License
 
