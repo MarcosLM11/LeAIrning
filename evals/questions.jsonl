@@ -28,4 +28,4 @@
 {"id": "q028", "type": "unanswerable", "question": "How does HTTP/2 multiplex streams over a single connection?", "doc": null, "gold_passages": null, "answer": null}
 {"id": "q029", "type": "unanswerable", "question": "How should a refresh token be rotated after it is used?", "doc": null, "gold_passages": null, "answer": null}
 {"id": "q030", "type": "unanswerable", "question": "Which Docker base image is recommended for a service that validates JWTs?", "doc": null, "gold_passages": null, "answer": null}
-{"id": "q031", "type": "unanswerable", "question": "How do I add comments to a JSON file?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q031", "type": "unanswerable", "question": "How do I verify a JWT signature with the Nimbus JOSE library in Java?", "doc": null, "gold_passages": null, "answer": null}
