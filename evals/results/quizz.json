@@ -1,0 +1,63 @@
+{
+  "generatorModel" : "gpt-5-mini",
+  "judgeModel" : "gpt-5-mini",
+  "chunks" : 188,
+  "retrievalBaselineChunks" : 188,
+  "quizzesFailed" : 0,
+  "questionsRequested" : 90,
+  "questionsReturned" : 90,
+  "deficit" : 0.0,
+  "supported" : 0.922,
+  "uniqueCorrect" : 0.967,
+  "distractorsPlausible" : 0.967,
+  "selfContained" : 0.967,
+  "allFourGood" : 0.867,
+  "duplicated" : 0.0,
+  "correctIndexCounts" : [ 19, 33, 28, 10 ],
+  "perQuizz" : [ {
+    "difficulty" : "FACIL",
+    "duplicated" : 0,
+    "doc" : "rfc6455.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "MEDIO",
+    "duplicated" : 0,
+    "doc" : "rfc6455.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "DIFICIL",
+    "duplicated" : 0,
+    "doc" : "rfc6455.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "FACIL",
+    "duplicated" : 0,
+    "doc" : "rfc7519.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "MEDIO",
+    "duplicated" : 0,
+    "doc" : "rfc7519.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "DIFICIL",
+    "duplicated" : 0,
+    "doc" : "rfc7519.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "FACIL",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "MEDIO",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
+    "returned" : 10
+  }, {
+    "difficulty" : "DIFICIL",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
+    "returned" : 10
+  } ]
+}
