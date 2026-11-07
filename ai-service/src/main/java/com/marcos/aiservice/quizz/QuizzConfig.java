@@ -19,7 +19,8 @@ public class QuizzConfig {
             - Cada opción es una respuesta completa y concreta, escrita como una frase o un término real.
               Nunca una letra (A, B, C...), nunca una pregunta, nunca "ninguna de las anteriores".
             - Da la única respuesta correcta y, por separado, las incorrectas. Las incorrectas son plausibles, del mismo tema y claramente erróneas según el texto.
-            - Las respuestas no se repiten y la correcta no es más larga ni más detallada que las incorrectas.
+            - Las respuestas no se repiten. La correcta es breve y directa; cada incorrecta tiene al menos su misma longitud y nivel de detalle, con la misma estructura de frase.
+              Quien no haya leído el texto no debe poder acertar fijándose en la longitud.
             - La explicación cita el dato del texto que justifica la respuesta.
             - Solo puedes usar información presente en el texto. No repitas temas entre preguntas.
 
@@ -28,7 +29,9 @@ public class QuizzConfig {
 
             Ejemplo de pregunta buena:
             Pregunta: ¿Qué símbolo se usa para escribir comentarios en Zorblat?
-            Correcta: "~~". Incorrectas: "//", "#", "--".
+            Pregunta: ¿Qué hace el operador "~~" en Zorblat?
+            Correcta: "Comenta el resto de la línea".
+            Incorrectas: "Concatena dos cadenas de texto en una sola", "Declara una variable global dentro del módulo", "Convierte un número en su valor negativo".
             Ejemplo de pregunta mala: respuestas "A", "B", "C", "D", o una respuesta como "¿Qué es un comentario?".
             """;
 
