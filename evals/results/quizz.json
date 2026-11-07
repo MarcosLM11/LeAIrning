@@ -5,59 +5,59 @@
   "retrievalBaselineChunks" : 188,
   "quizzesFailed" : 0,
   "questionsRequested" : 90,
-  "questionsReturned" : 89,
-  "deficit" : 0.011,
-  "supported" : 1.0,
-  "uniqueCorrect" : 0.989,
-  "distractorsPlausible" : 0.978,
-  "selfContained" : 0.989,
-  "allFourGood" : 0.955,
-  "duplicated" : 0.022,
-  "correctIndexCounts" : [ 15, 27, 24, 23 ],
+  "questionsReturned" : 88,
+  "deficit" : 0.022,
+  "supported" : 0.977,
+  "uniqueCorrect" : 0.977,
+  "distractorsPlausible" : 0.955,
+  "selfContained" : 1.0,
+  "allFourGood" : 0.92,
+  "duplicated" : 0.0,
+  "correctIndexCounts" : [ 24, 22, 24, 18 ],
   "perQuizz" : [ {
-    "doc" : "rfc6455.pdf",
-    "duplicated" : 2,
     "difficulty" : "FACIL",
-    "returned" : 10
-  }, {
+    "duplicated" : 0,
     "doc" : "rfc6455.pdf",
-    "duplicated" : 0,
-    "difficulty" : "MEDIO",
     "returned" : 10
   }, {
+    "difficulty" : "MEDIO",
+    "duplicated" : 0,
     "doc" : "rfc6455.pdf",
-    "duplicated" : 0,
-    "difficulty" : "DIFICIL",
-    "returned" : 9
+    "returned" : 10
   }, {
-    "doc" : "rfc7519.pdf",
+    "difficulty" : "DIFICIL",
     "duplicated" : 0,
+    "doc" : "rfc6455.pdf",
+    "returned" : 8
+  }, {
     "difficulty" : "FACIL",
+    "duplicated" : 0,
+    "doc" : "rfc7519.pdf",
     "returned" : 10
   }, {
-    "doc" : "rfc7519.pdf",
-    "duplicated" : 0,
     "difficulty" : "MEDIO",
-    "returned" : 10
-  }, {
+    "duplicated" : 0,
     "doc" : "rfc7519.pdf",
-    "duplicated" : 0,
-    "difficulty" : "DIFICIL",
     "returned" : 10
   }, {
-    "doc" : "rfc8259.pdf",
+    "difficulty" : "DIFICIL",
     "duplicated" : 0,
+    "doc" : "rfc7519.pdf",
+    "returned" : 10
+  }, {
     "difficulty" : "FACIL",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
     "returned" : 10
   }, {
-    "doc" : "rfc8259.pdf",
-    "duplicated" : 0,
     "difficulty" : "MEDIO",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
     "returned" : 10
   }, {
-    "doc" : "rfc8259.pdf",
-    "duplicated" : 0,
     "difficulty" : "DIFICIL",
+    "duplicated" : 0,
+    "doc" : "rfc8259.pdf",
     "returned" : 10
   } ]
 }
