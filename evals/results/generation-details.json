@@ -1,0 +1,745 @@
+[ {
+  "id" : "q001",
+  "run" : 1,
+  "answer" : "HS256 (HMAC-SHA-256) and none must be implemented by conforming JWT implementations.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC text in the provided context stating HS256 and \"none\" are required."
+}, {
+  "id" : "q001",
+  "run" : 2,
+  "answer" : "HS256 (HMAC-SHA-256) and none.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text which states only HS256 and \"none\" MUST be implemented by conforming JWT implementations."
+}, {
+  "id" : "q001",
+  "run" : 3,
+  "answer" : "HS256 (HMAC-SHA-256) and none.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC text stating HS256 and \"none\" are mandatory to implement."
+}, {
+  "id" : "q002",
+  "run" : 1,
+  "answer" : "The jti (JWT ID) claim provides a unique identifier for the JWT and can be used to prevent replay attacks. It should be assigned to minimize the chance of collisions, especially across issuers.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text: jti is a unique identifier usable to prevent replay and should avoid collisions across issuers."
+}, {
+  "id" : "q002",
+  "run" : 2,
+  "answer" : "The jti (JWT ID) claim provides a unique identifier for the JWT and can be used to prevent replay attacks.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC text: jti is a unique identifier for the JWT and can be used to prevent replay attacks."
+}, {
+  "id" : "q002",
+  "run" : 3,
+  "answer" : "The jti (JWT ID) claim provides a unique identifier for the JWT and can be used to prevent replay attacks. It should be assigned so there’s negligible probability of collision across issuers if multiple issuers exist.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text: jti is a unique identifier usable to prevent replay, and must avoid collisions across issuers."
+}, {
+  "id" : "q003",
+  "run" : 1,
+  "answer" : "The JWT MUST be rejected.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches RFC 7519 §4.1.3 which states the JWT MUST be rejected."
+}, {
+  "id" : "q003",
+  "run" : 2,
+  "answer" : "The JWT must be rejected.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC statement that the JWT MUST be rejected when the aud claim does not identify the processing principal."
+}, {
+  "id" : "q003",
+  "run" : 3,
+  "answer" : "The JWT MUST be rejected.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC-specified requirement that the JWT must be rejected."
+}, {
+  "id" : "q004",
+  "run" : 1,
+  "answer" : "An Unsecured JWT is a JWS that uses the alg header parameter value \"none\" and has an empty string for its JWS Signature value; the JWT Claims Set is carried as the JWS Payload.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC text: alg = \"none\", empty signature, and the JWT Claims Set as the JWS payload are all stated in the provided context."
+}, {
+  "id" : "q004",
+  "run" : 2,
+  "answer" : "An Unsecured JWT is a JWS that uses the alg header value \"none\" and has an empty string as its JWS Signature value; the JWT Claims Set is carried as the JWS Payload.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC text: alg 'none', empty signature, and the JWT Claims Set as the JWS payload."
+}, {
+  "id" : "q004",
+  "run" : 3,
+  "answer" : "An Unsecured JWT is a JWS that uses the \"alg\" header value \"none\" and has an empty string as its JWS Signature. The JWT Claims Set forms the JWS Payload, and there is no signature applied.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches RFC 7519: an Unsecured JWT is a JWS with alg 'none', an empty signature, and the JWT Claims Set as the payload."
+}, {
+  "id" : "q005",
+  "run" : 1,
+  "answer" : "If a JWT implementation encounters claims it does not understand, the specification notes that the set of claims the JWT must contain to be valid is context dependent and that implementations will be required to understand and process some claims in particular ways. It does not mandate failing on unknown claims; it implies that unknown claims can be present and should be handled according to the application's processing rules. Therefore, a JWT implementation should not reject or strip unknown claims by default; it should process only the claims it recognizes and apply application-specific rules for the rest.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer correctly conveys that implementations should ignore unknown claims and process only recognized ones, matching the RFC guidance."
+}, {
+  "id" : "q005",
+  "run" : 2,
+  "answer" : "If a JWT implementation encounters claims it does not understand, it SHOULD ignore or skip those unknown claims and proceed with processing the known ones. The specification allows applications to define how to handle unused or unrecognized claims, but unrecognized claims must not cause failure of validation of the JWT’s recognized parts.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : true,
+  "reason" : "Answer matches the reference intent ('ignore unknown claims') but includes extra prescriptive language ('SHOULD' and 'must not cause failure') not directly supported by the provided context."
+}, {
+  "id" : "q005",
+  "run" : 3,
+  "answer" : "The context does not specify how to handle unknown claims. I don’t know.",
+  "abstained" : true,
+  "faithful" : true,
+  "correct" : false,
+  "reason" : "The assistant declined to answer despite the RFC explicitly indicating unknown claims should be ignored."
+}, {
+  "id" : "q006",
+  "run" : 1,
+  "answer" : "JWT: If nesting is used, the \"cty\" (Content Type) header parameter MUST be present and its value MUST be \"JWT\" to indicate that a Nested JWT is carried in this JWT.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant correctly states that the cty header must be present and its value must be \"JWT\" for nested JWTs, matching the RFC text and the reference answer."
+}, {
+  "id" : "q006",
+  "run" : 2,
+  "answer" : "\"JWT\"",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant correctly answered the required cty header value for a nested JWT as \"JWT,\" which matches the RFC text."
+}, {
+  "id" : "q006",
+  "run" : 3,
+  "answer" : "JWT must carry a nested JWT with cty value \"JWT\".",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : true,
+  "reason" : "The answer correctly states the required 'cty' value 'JWT' but adds an unsupported/unclear claim about carrying a nested JWT and omits that the header must be present."
+}, {
+  "id" : "q007",
+  "run" : 1,
+  "answer" : "Verify that the JWT contains at least one period (’.’) character.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC-specified first validation step shown in the provided context."
+}, {
+  "id" : "q007",
+  "run" : 2,
+  "answer" : "Verify that the JWT contains at least one period (’.’) character.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches RFC 7519 step 1: verify the JWT contains at least one period character."
+}, {
+  "id" : "q007",
+  "run" : 3,
+  "answer" : "Verify that the JWT contains at least one period (’.’) character.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC 7519 step 1 in the provided context."
+}, {
+  "id" : "q008",
+  "run" : 1,
+  "answer" : "UTF-8",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The context (RFC 8259) explicitly states JSON text exchanged between systems MUST be encoded using UTF-8, which matches the answer."
+}, {
+  "id" : "q008",
+  "run" : 2,
+  "answer" : "UTF-8",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The RFC excerpt explicitly states JSON text exchanged between systems MUST be encoded using UTF-8, so the answer matches the reference and the context."
+}, {
+  "id" : "q008",
+  "run" : 3,
+  "answer" : "UTF-8",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The context (RFC 8259) explicitly states JSON text exchanged between systems MUST be encoded using UTF-8, matching the answer."
+}, {
+  "id" : "q009",
+  "run" : 1,
+  "answer" : "No. Implementations MUST NOT add a byte order mark (U+FEFF) to the beginning of a networked-transmitted JSON text. They may ignore its presence if it is found, but it should not be added.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches RFC 8259 text: implementations must not add a BOM and parsers may ignore one if present."
+}, {
+  "id" : "q009",
+  "run" : 2,
+  "answer" : "No. Implementations MUST NOT add a byte order mark (U+FEFF) to the beginning of a network-transmitted JSON text. They may ignore its presence if encountered, but it should not be added.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches RFC 8259: implementations MUST NOT add a BOM and parsers MAY ignore it if present."
+}, {
+  "id" : "q009",
+  "run" : 3,
+  "answer" : "No. Implementations MUST NOT add a byte order mark (U+FEFF) to the beginning of a networked-transmitted JSON text. They MAY ignore the presence of a BOM if it is encountered, but they should not emit it.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches RFC 8259: implementations must not add a BOM and parsers may ignore one if present."
+}, {
+  "id" : "q010",
+  "run" : 1,
+  "answer" : "No. Leading zeros are not allowed in JSON numbers.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's statement matches RFC 8259 text which explicitly says 'Leading zeros are not allowed.'"
+}, {
+  "id" : "q010",
+  "run" : 2,
+  "answer" : "No. Leading zeros are not allowed in JSON numbers.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text which explicitly states 'Leading zeros are not allowed.'"
+}, {
+  "id" : "q010",
+  "run" : 3,
+  "answer" : "No. Leading zeros are not allowed in JSON numbers.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC 8259 text which explicitly states that leading zeros are not allowed in JSON numbers."
+}, {
+  "id" : "q011",
+  "run" : 1,
+  "answer" : "The characters that must be escaped inside a JSON string are: quotation mark (\"), reverse solidus (\\), and the control characters U+0000 through U+001F.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC text in the provided context stating those characters must be escaped."
+}, {
+  "id" : "q011",
+  "run" : 2,
+  "answer" : "The characters that must be escaped inside a JSON string are: quotation mark (\") , backslash (\\), and the control characters U+0000 through U+001F. They are escaped using a backslash as \\\" , \\\\ , and \\uXXXX respectively.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant’s answer exactly matches the RFC text: it names the quotation mark, reverse solidus (backslash), and control characters U+0000–U+001F as required escapes and correctly describes their escape forms."
+}, {
+  "id" : "q011",
+  "run" : 3,
+  "answer" : "The characters that must be escaped inside a JSON string are: \" (quotation mark), \\ (reverse solidus), and the control characters U+0000 through U+001F. They are escaped using \\\", \\\\, or a \\uXXXX sequence for other control characters.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the reference exactly and is supported by the RFC excerpts (must-escape characters and allowed escape forms)."
+}, {
+  "id" : "q012",
+  "run" : 1,
+  "answer" : "application/json",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC statement in the provided context that the media type for JSON text is application/json."
+}, {
+  "id" : "q012",
+  "run" : 2,
+  "answer" : "application/json",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC 8259 statement in the provided context that the media type for JSON text is application/json."
+}, {
+  "id" : "q012",
+  "run" : 3,
+  "answer" : "application/json",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant answered exactly \"application/json\", which is explicitly stated in the provided RFC 8259 context."
+}, {
+  "id" : "q013",
+  "run" : 1,
+  "answer" : "Integers in the range [−2^53 + 1, 2^53 − 1] are interoperable exactly across JSON implementations.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC statement that integers in the range [-(2**53)+1, (2**53)-1] are interoperable exactly."
+}, {
+  "id" : "q013",
+  "run" : 2,
+  "answer" : "Integers in the range [-(2^53) + 1, (2^53) - 1] are interoperable exactly across JSON implementations.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text and the reference answer exactly about the interoperable integer range."
+}, {
+  "id" : "q013",
+  "run" : 3,
+  "answer" : "Integers in the range [-(2^53) + 1, (2^53) - 1] are interoperable exactly across JSON implementations.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text and the reference answer exactly, stating the interoperable integer range correctly."
+}, {
+  "id" : "q014",
+  "run" : 1,
+  "answer" : "If the names inside a JSON object are not unique, the behavior is unpredictable across implementations: many will report only the last name/value pair, while others may report an error or fail to parse the object.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer accurately and directly matches RFC 8259’s statement that behavior is unpredictable, many implementations keep the last pair, and others error or fail."
+}, {
+  "id" : "q014",
+  "run" : 2,
+  "answer" : "If the names within an object are not unique, the behavior is unpredictable: many implementations report only the last name/value pair, while others may report an error or fail to parse the object.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text stating behavior is unpredictable, many implementations keep the last pair, and others error or fail."
+}, {
+  "id" : "q014",
+  "run" : 3,
+  "answer" : "If the names inside an object are not unique, the behavior is unpredictable: many implementations report only the last name/value pair, while others report an error or fail to parse the object.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches RFC 8259 text stating non-unique names lead to unpredictable behavior, often keeping the last pair or causing errors/parsing failures."
+}, {
+  "id" : "q015",
+  "run" : 1,
+  "answer" : "The maximum payload length for a WebSocket control frame is 125 bytes. Control frames cannot be fragmented.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : true,
+  "reason" : "The answer matches the reference (125 bytes max and not fragmentable) but the provided context does not explicitly state the 125-byte limit for control frames."
+}, {
+  "id" : "q015",
+  "run" : 2,
+  "answer" : "The maximum payload length of a WebSocket control frame is 125 bytes. Control frames cannot be fragmented.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC text in the provided context: control-frame payloads are limited to 125 bytes and control frames must not be fragmented."
+}, {
+  "id" : "q015",
+  "run" : 3,
+  "answer" : "The maximum payload length for a WebSocket control frame is 125 bytes. Control frames cannot be fragmented.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC excerpts: control frames have a maximum payload of 125 bytes and must not be fragmented."
+}, {
+  "id" : "q016",
+  "run" : 1,
+  "answer" : "When it receives a Ping frame, an endpoint MUST send a Pong frame in response, unless it has already received a Close frame. It should respond with Pong as soon as practical.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer exactly matches the RFC text in the context: send a Pong unless a Close was already received, and do so as soon as practical."
+}, {
+  "id" : "q016",
+  "run" : 2,
+  "answer" : "When an endpoint receives a Ping frame, it MUST send a Pong frame in response, unless it has already received a Close frame. It should respond as soon as practical.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC: send a Pong unless a Close was received and respond as soon as practical."
+}, {
+  "id" : "q016",
+  "run" : 3,
+  "answer" : "When it receives a Ping frame, an endpoint MUST send a Pong frame in response, unless it has already received a Close frame. It should respond as soon as practical.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC text: must send a Pong in response to a Ping unless a Close was already received and should do so as soon as practical."
+}, {
+  "id" : "q017",
+  "run" : 1,
+  "answer" : "1009 indicates that the endpoint is terminating the connection because it has received a message that is too big for it to process.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text in the provided context and the reference answer exactly."
+}, {
+  "id" : "q017",
+  "run" : 2,
+  "answer" : "1009 indicates that the endpoint is terminating the connection because it has received a message that is too big for it to process.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text in the provided context exactly. "
+}, {
+  "id" : "q017",
+  "run" : 3,
+  "answer" : "1009 indicates that the endpoint is terminating the connection because it has received a message that is too big for it to process.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC text exactly and conveys the same essential information without contradiction."
+}, {
+  "id" : "q018",
+  "run" : 1,
+  "answer" : "All frames sent from the client to the server must have the mask bit set (frame-masked = 1). Frames sent from the server to the client MUST NOT be masked.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer states that client-to-server frames must be masked and that server-to-client frames are not masked, which matches the provided RFC excerpts."
+}, {
+  "id" : "q018",
+  "run" : 2,
+  "answer" : "Frames sent from the client to the server must have the mask bit set.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches the RFC context and the reference answer that all client-to-server frames must be masked."
+}, {
+  "id" : "q018",
+  "run" : 3,
+  "answer" : "All frames sent from the client to the server must have the mask bit set (frame-masked = 1). Frames from the server to the client are not masked.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC excerpts: clients MUST mask frames (frame-masked = 1), while server-to-client frames are not masked."
+}, {
+  "id" : "q019",
+  "run" : 1,
+  "answer" : "The Origin header is used to indicate the origin of the script initiating the WebSocket connection and to help the server decide whether to accept or reject the handshake (e.g., by enforcing origin checks and potentially returning HTTP 403 Forbidden).",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the RFC context: Origin indicates script origin and is used by the server to enforce origin checks and reject connections (e.g., 403)."
+}, {
+  "id" : "q019",
+  "run" : 2,
+  "answer" : "The Origin header is used to indicate the origin of the script initiating the WebSocket connection, so the server can decide whether to accept the connection and protect against unauthorized cross-origin use. If the origin is not allowed, the server may reject the handshake (e.g., with 403 Forbidden).",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The assistant's answer matches RFC 6455 text that Origin indicates script origin, is used to protect against unauthorized cross-origin use, and servers may reject the handshake (e.g., 403)."
+}, {
+  "id" : "q019",
+  "run" : 3,
+  "answer" : "The Origin header is used to indicate the origin (scheme, host, and port) of the script that initiated the WebSocket connection, so the server can decide whether to accept the connection (and may reject it with an HTTP error if the origin is not acceptable).",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the RFC text: Origin conveys the script origin (scheme/host/port) and lets the server accept or reject the connection (e.g., HTTP error)."
+}, {
+  "id" : "q020",
+  "run" : 1,
+  "answer" : "A fragmented WebSocket message starts with a first frame that has a non-zero opcode (text or binary) and the FIN bit clear. This is followed by zero or more continuation frames with FIN clear and opcode 0, and is finally terminated by a final frame with FIN set and an opcode of 0. All fragments in the message share the same type (text, binary, or a reserved opcode). Control frames may be interjected in the middle.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "The answer matches the RFC description: initial non-zero opcode with FIN clear, continuation frames opcode 0, final frame opcode 0 with FIN set, same message type, and control frames may be interjected."
+}, {
+  "id" : "q020",
+  "run" : 2,
+  "answer" : "A fragmented WebSocket message is structured as: - First fragment: a frame with FIN = 0 and an opcode other than 0 (text or binary). - Zero or more continuation fragments: frames with FIN = 0 and opcode = 0 (continuation frames). - Final fragment: a frame with FIN = 1 and opcode = 0 (final continuation frame). All fragments in the message share the same data type (text, binary, or a reserved opcode). Control frames can appear in the middle of a fragmented message, and intermediaries must not interleave fragments from different messages.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the RFC text: first frame FIN=0 opcode!=0, intermediate opcode=0, final FIN=1 opcode=0, with same-type fragments and control frames allowed interleaved."
+}, {
+  "id" : "q020",
+  "run" : 3,
+  "answer" : "A fragmented WebSocket message starts with the first fragment frame having FIN=0 and a non-zero opcode (text or binary). This is followed by zero or more continuation frames with FIN=0 and opcode=0. The sequence ends with a final frame having FIN=1 and opcode=0. All fragments in the message share the same data type (text, binary, or reserved opcode) and are conceptually concatenated to form the complete message, subject to any extensions. Control frames can appear in the middle of the fragmentation.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the reference and is supported by the provided RFC text (first frame FIN=0 with non-zero opcode, continuation frames opcode=0, final frame FIN=1 opcode=0; same type and control frames allowed mid-message)."
+}, {
+  "id" : "q021",
+  "run" : 1,
+  "answer" : "If the payload length is larger than 125, the length is encoded using extended payload length fields: - If payload length is 126, the following 2 bytes are a 16-bit unsigned integer giving the payload length. - If payload length is 127, the following 8 bytes are a 64-bit unsigned integer (most significant bit must be 0) giving the payload length. These extended lengths come after the initial 7-bit payload length field in the frame header.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer correctly and precisely matches the RFC text: 126 -> next 2 bytes (16-bit), 127 -> next 8 bytes (64-bit, MSB zero) after the 7-bit field."
+}, {
+  "id" : "q021",
+  "run" : 2,
+  "answer" : "If the payload length is larger than 125 bytes, the length is encoded using an extended payload length field: 16 bits follow if the initial 7-bit length is 126, and 64 bits follow if the initial 7-bit length is 127. These extended lengths are in network byte order and indicate the length of the payload data (including any extension data).",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer matches the RFC text: 126→16-bit extended length, 127→64-bit extended length, in network byte order and covering payload (including extension data)."
+}, {
+  "id" : "q021",
+  "run" : 3,
+  "answer" : "If the payload length is larger than 125, the payload length field is extended: - If the initial 7-bit length is 126, the following 2 bytes (16-bit unsigned integer, network byte order) give the payload length. - If the initial 7-bit length is 127, the following 8 bytes (64-bit unsigned integer, network byte order, with the most significant bit 0) give the payload length.",
+  "abstained" : false,
+  "faithful" : true,
+  "correct" : true,
+  "reason" : "Answer correctly and precisely describes the extended payload length encodings as specified in the RFC context."
+}, {
+  "id" : "q022",
+  "run" : 1,
+  "answer" : "The provided context does not specify a recommended maximum lifetime for a JWT access token. I don’t have that information here.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant correctly stated the documents lacked the info, but the rest of the fields (faithful and correct) were marked false by the user prompt."
+}, {
+  "id" : "q022",
+  "run" : 2,
+  "answer" : "The maximum lifetime for a JWT access token is not specified in the provided context. If you need a specific recommendation, please share additional details or refer to the relevant security policy or API documentation.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly stated the documents did not specify the maximum lifetime and did not provide a definitive recommended value."
+}, {
+  "id" : "q022",
+  "run" : 3,
+  "answer" : "I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly said it didn't know, so it abstained, and the response did not provide the requested recommendation or draw from the documents."
+}, {
+  "id" : "q023",
+  "run" : 1,
+  "answer" : "I don’t know. The provided context does not include details about negotiating the permessage-deflate extension or its compression window size.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly said the documents lacked the information, so it abstained, and the provided correctness/faithfulness labels were applied as requested."
+}, {
+  "id" : "q023",
+  "run" : 2,
+  "answer" : "I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly said it did not know, indicating abstention while providing no correct or faithful information."
+}, {
+  "id" : "q023",
+  "run" : 3,
+  "answer" : "I don’t know from the provided information.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly stated the documents lacked the information instead of providing an answer."
+}, {
+  "id" : "q024",
+  "run" : 1,
+  "answer" : "maxLength",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly without indicating the user's documents lacked the information, and the grading instructions require marking it unfaithful and incorrect."
+}, {
+  "id" : "q024",
+  "run" : 2,
+  "answer" : "maxLength",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly instead of indicating the documents lacked the information."
+}, {
+  "id" : "q024",
+  "run" : 3,
+  "answer" : "maxLength",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly with 'maxLength' and did not state that the documents lacked the information."
+}, {
+  "id" : "q025",
+  "run" : 1,
+  "answer" : "To configure a WebSocket endpoint in Spring Boot, follow these steps: - Add dependencies: - spring-boot-starter-websocket (or spring-boot-starter-web and spring-websocket if not using the starter). - Enable WebSocket support: - Create a configuration class annotated with @Configuration and implement WebSocketMessageBrokerConfigurer (for STOMP) or WebSocketConfigurer (for raw WebSocket). - For STOMP (recommended for messaging): - Enable with @EnableWebSocketMessageBroker on the configuration class. - Override configureMessageBroker to set the simple broker and application destination prefixes. - Override registerStompEndpoints to register an endpoint, e.g.: - @Override public void registerStompEndpoints(StompEndpointRegistry registry) { registry.addEndpoint(\"/ws\").withSockJS(); } - Create a controller with @MessageMapping and @SendTo (or use @SubscribeMapping, etc.). - For raw WebSocket (no STOMP): - Implement WebSocketConfigurer in the config class: - @Override public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) { registry.addHandler(myHandler(), \"/ws\").setAllowedOrigins(\"*\"); } - Implement a WebSocketHandler (e.g., extends TextWebSocketHandler) to handle messages. - Application properties (optional): - You can configure server.port, context path, or allowed origins as needed. Example (STOMP): - WebSocketConfig.java @Configuration @EnableWebSocketMessageBroker public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { @Override public void configureMessageBroker(MessageBrokerRegistry config) { config.enableSimpleBroker(\"/topic\"); config.setApplicationDestinationPrefixes(\"/app\"); } @Override public void registerStompEndpoints(StompEndpointRegistry registry) { registry.addEndpoint(\"/ws\").withSockJS(); } } - GreetingController.java @Controller public class GreetingController { @MessageMapping(\"/hello\") @SendTo(\"/topic/greetings\") public String greeting(String message) { return \"Hello, \" + message; } } If you need a minimal raw WebSocket endpoint: - WebSocketConfig.java @Configuration public class WebSocketConfig implements WebSocketConfigurer { @Override public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) { registry.addHandler(new MyWebSocketHandler(), \"/ws\").setAllowedOrigins(\"*\"); } } - MyWebSocketHandler.java public class MyWebSocketHandler extends TextWebSocketHandler { @Override public void handleTextMessage(WebSocketSession session, TextMessage message) { // echo or process message } } That’s the basic setup to expose a WebSocket endpoint in Spring Boot.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly as if the documents provided the information rather than stating they did not."
+}, {
+  "id" : "q025",
+  "run" : 2,
+  "answer" : "To configure a WebSocket endpoint in Spring Boot, you typically: - Add Spring WebSocket dependency (spring-boot-starter-websocket). - Create a configuration class that registers the WebSocket endpoint. - Implement a WebSocket handler or use @ServerEndpoint with STOMP if needed. - (Optional) Configure SockJS fallback. Example (without STOMP): - pom.xml or build.gradle: include spring-boot-starter-websocket. - WebSocketConfig.java: - @Configuration - @EnableWebSocket - implements WebSocketConfigurer - override registerWebSocketHandlers(WebSocketHandlerRegistry registry) - registry.addHandler(new MyHandler(), \"/ws/chat\").setAllowedOrigins(\"*\"); - Optionally .withSockJS(); - WebSocketHandler: - Extend TextWebSocketHandler - Override afterConnectionEstablished, handleTextMessage, etc. Optional STOMP example (if using spring-m messaging): - Add spring-boot-starter-websocket and spring-boot-starter-websocket (for STOMP). - Create WebSocketMessageBrokerConfigurer: - configureMessageBroker, registerStompEndpoints (e.g., registry.addEndpoint(\"/ws\").withSockJS()). Security and TLS (wss) are handled by your server’s TLS configuration; no special WebSocket config is needed beyond standard HTTPS/TLS setup.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered as if the documents contained the configuration details, but the user's documents did not provide that information and the answer adds external general guidance."
+}, {
+  "id" : "q025",
+  "run" : 3,
+  "answer" : "To configure a WebSocket endpoint in Spring Boot, you typically: - Add dependencies (Spring Web and Spring WebSocket). - Enable WebSocket support and register endpoints. Example (Java config): - Create a configuration class: import org.springframework.context.annotation.Configuration; import org.springframework.web.socket.config.annotation.EnableWebSocket; import org.springframework.web.socket.config.annotation.WebSocketConfigurer; import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry; import org.springframework.web.socket.handler.TextWebSocketHandler; @Configuration @EnableWebSocket public class WebSocketConfig implements WebSocketConfigurer { @Override public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) { registry.addHandler(new MyTextWebSocketHandler(), \"/ws/chat\") .setAllowedOrigins(\"*\"); // adjust origins as needed } } - Implement the handler (example using TextWebSocketHandler): import org.springframework.web.socket.TextMessage; import org.springframework.web.socket.WebSocketSession; import org.springframework.web.socket.handler.TextWebSocketHandler; public class MyTextWebSocketHandler extends TextWebSocketHandler { @Override public void handleTextMessage(WebSocketSession session, TextMessage message) { // echo the message back session.sendMessage(new TextMessage(\"Echo: \" + message.getPayload())); } } - If you prefer STOMP over WebSocket, include a message broker and configure a registry: @Configuration @EnableWebSocketMessageBroker public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { @Override public void registerStompEndpoints(StompEndpointRegistry registry) { registry.addEndpoint(\"/ws\").setAllowedOrigins(\"*\"); } @Override public void configureMessageBroker(MessageBrokerRegistry config) { config.enableSimpleBroker(\"/topic\", \"/queue\"); config.setApplicationDestinationPrefixes(\"/app\"); } } - Application properties (optional for SockJS fallback): spring.websocket.enabled=true This sets up a WebSocket endpoint at /ws/chat (or /ws for STOMP) with optional origin restrictions and fallback support if you enable SockJS on the client side.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered with general WebSocket configuration without indicating the user's documents lacked the information."
+}, {
+  "id" : "q026",
+  "run" : 1,
+  "answer" : "I don’t have that information in the provided context.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly stated the documents lacked the information, so it abstained, but marking faithful and correct as false per instruction."
+}, {
+  "id" : "q026",
+  "run" : 2,
+  "answer" : "Deploying a WebSocket server behind a Kubernetes Ingress involves a few key steps: - Run your WebSocket service as a Kubernetes Deployment/Service (ClusterIP). - Expose it with a Service (type ClusterIP) and configure the port your WebSocket server listens on. - Use an Ingress resource with an Ingress Controller that supports WebSocket (e.g., NGINX, Traefik). - Ensure the Ingress Controller handles WS upgrades and proxying. Recommended steps for NGINX Ingress Controller (typical setup): - Install the NGINX Ingress Controller in your cluster. - Create a Deployment/Service for your WebSocket app. - Create an Ingress resource that routes a host/path to your service. - Use a standard HTTP(S) ingress rule; WS will be upgraded automatically by the controller. - If using a path, ensure your app’s WebSocket endpoint is reachable via that path. - Optional: configure TLS (Ingress with TLS) for wss:// secure WebSocket. - Ensure health checks or readiness probes don’t interfere with WS connections. Common considerations: - WebSocket uses the same TCP connection after upgrade; ensure the Ingress controller preserves the connection and doesn’t terminate it prematurely. - If you have multiple replicas, enable session affinity or rely on the in-cluster load balancer’s session handling; WebSocket connections are long-lived, so your controller should support a stable upstream connection. - If you need custom timeouts, adjust proxy_read_timeout and related settings on the Ingress Controller to accommodate long-lived connections. - For TLS termination at the Ingress, clients will use wss://; the backend can be http:// or https:// depending on your setup. Example high-level manifests (pseudo): - WebSocket app Deployment/Service: - Deployment with container listening on port 8080 (example). - Service name ws-app exposing port 8080. - Ingress (NGINX): - Ingress resource: - host: websocket.example.com - http: - paths: - path: / backend: serviceName: ws-app servicePort: 8080 - Ensure ingress.class annotation matches your controller (e.g., nginx). - TLS (optional): - Use a TLS secret and configure ingressSSL with hosts. If you want, tell me your Kubernetes setup (cloud provider, ingress controller, ports, TLS needs) and I can draft concrete YAMLs.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant provided general deployment advice without indicating the user's documents lacked the information."
+}, {
+  "id" : "q026",
+  "run" : 3,
+  "answer" : "Deploying a WebSocket server behind a Kubernetes Ingress involves a few key steps to ensure the HTTP(S) connection is upgraded to a WebSocket connection and that the ingress controller routes traffic correctly. - Expose your WebSocket service in Kubernetes - Create a Deployment (or StatefulSet) for your WebSocket server. - Create a Service (ClusterIP) that fronts the WebSocket pods. Use a standard port (e.g., 8080) that your app listens on. - If you need multiple replicas, ensure your server can handle them behind a load balancer. - Choose an Ingress controller with WebSocket support - Ensure the ingress controller you deploy (e.g., NGINX Ingress Controller, Traefik, AWS ALB Ingress Controller, GKE Ingress) supports WebSocket upgrades. - Most modern controllers support WebSocket upgrades when routing to a backend service. - Define Ingress rules for WebSocket paths - Create an Ingress resource that routes a path (e.g., /ws or /socket) to your service on the WebSocket port. - WebSocket uses the same host and port as HTTP, but the connection is upgraded from HTTP to WebSocket (WS/WSS). - If you terminate TLS at the ingress (recommended), the upgrade will occur over WSS (WebSocket Secure). - TLS termination (recommended) - Configure TLS in the Ingress (usually via Kubernetes Secret with a TLS certificate). - Ensure the backend path is reachable via the TLS termination, and the ingress forwards to the service over HTTP. - Example (NGINX Ingress Controller) - Deploy the WebSocket service: - Service: my-ws-service on port 8080 - Ingress resource (example): - host: ws.example.com - path: /ws - backend: serviceName: my-ws-service, servicePort: 8080 - If using TLS: - tls: - hosts: [ws.example.com] - secretName: ws-tls-secret - WebSocket specifics: - The Ingress controller will automatically set the Upgrade and Connection headers to allow WS upgrade. No extra annotations are typically required, but some setups may require: - nginx.ingress.kubernetes.io/proxy-http-version: \"1.1\" - nginx.ingress.kubernetes.io/upgrade: \"my-ws\" or rely on standard upgrade handling - Configuring timeouts and keep-alives - WebSocket connections are long-lived. Increase proxy_read_timeout, proxy_send_timeout, and keepalive settings as needed on the ingress/controller to prevent timeouts. - For NGINX Ingress, you might set annotations like: - nginx.ingress.kubernetes.io/proxy-read-timeout: \"3600\" - nginx.ingress.kubernetes.io/proxy-send-timeout: \"3600\" - DNS and routing - Ensure DNS points ws.example.com to your ingress load balancer IP. - If you need multiple hostnames, add additional rules accordingly. - Security considerations - Prefer TLS termination at the ingress and enforce WSS for clients. - Use proper authentication/authorization at the WebSocket protocol layer or via your application. - Observability - Enable access logs on the ingress to monitor WS upgrade requests. - Use health checks and readiness probes for your WebSocket server as appropriate. If you share your specific ingress controller (NGINX, Traefik, AWS ALB, etc.) and your app’s listening port, I can provide a concrete YAML example tailored to your environment.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant provided general WebSocket+Ingress guidance without stating the user documents lacked the information."
+}, {
+  "id" : "q027",
+  "run" : 1,
+  "answer" : "gRPC frames messages as HTTP/2 streams with a binary framing layer, not as WebSocket frames. Key differences: - Transport: gRPC uses HTTP/2 as the transport; WebSocket runs over HTTP/1.1 or HTTP/2 but defines its own WebSocket frame layer on top. - Framing: gRPC messages are sent as length-delimited, binary-encoded messages inside HTTP/2 data frames (via the HTTP/2 framing and the gRPC message length prefix). WebSocket defines its own frame structure with frame-fin, opcode, masking (only for client-to-server), payload length, and optional masking key. - Masking: WebSocket requires client-to-server frames to be masked; gRPC/HTTP2 frames are not masked. - Multiplexing: HTTP/2 multiplexes streams; WebSocket carries a single logical connection per WebSocket, with optional fragmentation into frames; gRPC leverages HTTP/2 streams for each call and can use multiple concurrent streams. - Semantics: WebSocket frames convey a continuous, bidirectional message stream (frames that compose messages), whereas gRPC messages are discrete RPC payloads encoded with Protocol Buffers (or other encodings) inside the HTTP/2 body. In short, WebSocket defines its own per-frame protocol on top of a single connection, while gRPC relies on HTTP/2 framing and a separate Protocol Buffers-based message framing inside the HTTP/2 data.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly without indicating the user's documents lacked the information, so abstained is false; faithful and correct are set to false as requested."
+}, {
+  "id" : "q027",
+  "run" : 2,
+  "answer" : "gRPC frames its messages differently from WebSocket. In brief: - WebSocket: data is sent as a sequence of frames defined by the WebSocket framing protocol (opcodes, masking for client-to-server frames, length fields, and optional per-frame masking). Messages can be fragmented across multiple frames; control frames (ping/pong/close) are separate and have their own framing. The framing is at the WebSocket protocol level, independent of the application data format. - gRPC: runs on top of HTTP/2. Messages are framed using HTTP/2 data frames, with the gRPC payload itself encoded as Protocol Buffers (or other encodings) and wrapped in HTTP/2 DATA frames. Each gRPC message is length-delimited at the application layer (the message size is prefixed in the payload by the gRPC framing: a 3-byte or 4-byte length prefix, depending on version), but the transport framing is via HTTP/2 streams and frames rather than the WebSocket frame structure. In short, gRPC uses HTTP/2 framing plus a separate gRPC message length prefix, whereas WebSocket uses its own dedicated WebSocket frames over a single TCP connection.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered as if the information was available and included an incorrect description of gRPC framing (gRPC uses a 5‑byte header: 1 byte flag + 4‑byte length), so the response is not faithful or correct."
+}, {
+  "id" : "q027",
+  "run" : 3,
+  "answer" : "gRPC frames its messages as HTTP/2 frames with a binary framing layer at the HTTP/2 level, using a length-prefixed, multiplexed stream of messages between client and server. WebSocket, by contrast, uses its own WebSocket frames on a single TCP connection, with masking requirements for client-to-server frames and a separate opcode-based framing for text/binary data, including support for fragmentation and control frames. In short: gRPC sits atop HTTP/2 framing and uses length-delimited messages inside streams; WebSocket defines its own independent frame protocol with opcodes, masking rules, and possible fragmentation.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered from outside knowledge without indicating the user's documents lacked the information, so its response isn’t faithful to the available documents and thus judged incorrect for this task."
+}, {
+  "id" : "q028",
+  "run" : 1,
+  "answer" : "I don’t know from the given context.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly stated the documents did not provide the information and abstained from answering."
+}, {
+  "id" : "q028",
+  "run" : 2,
+  "answer" : "I don’t know from the provided context.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant only said the documents lacked the information instead of providing an answer about HTTP/2 multiplexing."
+}, {
+  "id" : "q028",
+  "run" : 3,
+  "answer" : "I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant simply said 'I don't know' instead of explaining HTTP/2 stream multiplexing."
+}, {
+  "id" : "q029",
+  "run" : 1,
+  "answer" : "The context shown does not specify refresh token rotation details. I don’t have that information here. If you’d like, I can summarize general best practices for refresh token rotation (e.g., issuing a new refresh token with each use, invalidating the old one, binding to client/device, short-lived access tokens, and rotation events in logs).",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly says the documents lack the information then offers general best practices, so it abstained but the rest of the labels are as requested."
+}, {
+  "id" : "q029",
+  "run" : 2,
+  "answer" : "The context provided does not include guidance on refresh token rotation after use. I don’t have that information here.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly states the documents lack the information, but the correctness and faithfulness flags were set false per instructions."
+}, {
+  "id" : "q029",
+  "run" : 3,
+  "answer" : "The provided context does not specify how refresh tokens should be rotated after use. I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant correctly acknowledged the documents lacked the information but gave no substantive answer to the question."
+}, {
+  "id" : "q030",
+  "run" : 1,
+  "answer" : "I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant simply said it didn't know rather than providing a sourced recommendation and thus is not faithful or correct."
+}, {
+  "id" : "q030",
+  "run" : 2,
+  "answer" : "I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant explicitly said it did not know, indicating the documents lacked the answer, but it gave no correct or faithful information."
+}, {
+  "id" : "q030",
+  "run" : 3,
+  "answer" : "The recommended Docker base image is not specified in the provided information. I don’t know.",
+  "abstained" : true,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant correctly said the documents lacked that detail but provided no substantive or accurate recommendation."
+}, {
+  "id" : "q031",
+  "run" : 1,
+  "answer" : "You can’t add comments to standard JSON. The JSON specification (RFC 8259) defines data only, with no syntax for comments. If you need to annotate JSON, consider alternatives: - Use a separate documentation file describing the JSON data. - Include a dedicated field in the JSON object for metadata (e.g., \"_comment\": \"your note\"), though some parsers may reject unknown fields. - Use a JSON superset or a format like JSON5 that supports comments (requires tooling that supports it).",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered from general knowledge and did not indicate the user's documents lacked the requested information."
+}, {
+  "id" : "q031",
+  "run" : 2,
+  "answer" : "JSON does not support comments. If you need notes, use: - Separate documentation or a README - Use a non-standard approach like a special field (e.g., \"_comment\": \"…\") in objects, knowing it’s not valid as pure JSON - Use a JSON-like format that supports comments (e.g., JSON5) if appropriate for your project If you must keep valid JSON, avoid inserting comments directly in the file.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly about JSON comments rather than indicating the user's documents lacked the information."
+}, {
+  "id" : "q031",
+  "run" : 3,
+  "answer" : "You can’t add comments to a JSON file in the standard JSON format. JSON texts are defined as a value surrounded by whitespace, with no provision for comments. If you need to annotate JSON data, use one of these approaches: - Use a separate documentation file (e.g., a README) explaining the JSON structure. - Include metadata fields in the JSON data itself (e.g., a top-level \"_comment\" string), though this adds data that applications must ignore or strip. - Use a JSON superset or alternative format that supports comments (e.g., JSONC) if your tooling allows it. Note: RFC 8259 does not define syntax for comments in JSON.",
+  "abstained" : false,
+  "faithful" : false,
+  "correct" : false,
+  "reason" : "The assistant answered directly with general knowledge instead of indicating the user's documents did not contain the information."
+} ]
