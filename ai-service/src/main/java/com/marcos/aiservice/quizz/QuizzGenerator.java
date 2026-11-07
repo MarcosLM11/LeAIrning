@@ -1,8 +1,12 @@
 package com.marcos.aiservice.quizz;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
@@ -53,13 +57,26 @@ class QuizzGenerator {
                         .param("options", options)
                         .param("text", text))
                 .call()
-                .entity(GeneratedQuizz.class, spec -> spec.useProviderStructuredOutput().validateSchema());
-        return onlyValid(quizz.questions(), options);
+                .entity(QuizzDraft.class, spec -> spec.useProviderStructuredOutput().validateSchema());
+        return toValid(quizz.questions(), options, ThreadLocalRandom.current());
     }
 
-    static List<GeneratedQuestion> onlyValid(List<GeneratedQuestion> questions, int options) {
+    /** Keeps the questions with the right number of distinct options and shuffles each one, so the correct position is random. */
+    static List<GeneratedQuestion> toValid(List<QuizzDraft.Question> questions, int options, Random random) {
         return questions.stream()
-                .filter(q -> q.options().size() == options && q.correctIndex() >= 0 && q.correctIndex() < options)
+                .filter(q -> q.correctAnswer() != null && q.wrongAnswers() != null && q.wrongAnswers().size() == options - 1)
+                .filter(q -> {
+                    var all = new ArrayList<>(q.wrongAnswers());
+                    all.add(q.correctAnswer());
+                    return all.stream().noneMatch(Objects::isNull)
+                            && all.stream().map(a -> a.strip().toLowerCase()).distinct().count() == options;
+                })
+                .map(q -> {
+                    var shuffled = new ArrayList<>(q.wrongAnswers());
+                    shuffled.add(q.correctAnswer());
+                    Collections.shuffle(shuffled, random);
+                    return new GeneratedQuestion(q.question(), shuffled, shuffled.indexOf(q.correctAnswer()), q.explanation());
+                })
                 .toList();
     }
 

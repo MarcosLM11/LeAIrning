@@ -8,8 +8,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -35,8 +37,8 @@ class QuizzGeneratorTest {
     @Test
     void failsWhenModelReturnsNoValidQuestions() {
         when(jdbc.sql(anyString()).param(anyString(), any()).param(anyString(), any()).query(String.class).list()).thenReturn(List.of("texto"));
-        when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(GeneratedQuizz.class), any(Consumer.class)))
-                .thenReturn(new GeneratedQuizz(List.of(new GeneratedQuestion("q", List.of("a"), 5, "e"))));
+        when(chatClient.prompt().user(any(Consumer.class)).call().entity(eq(QuizzDraft.class), any(Consumer.class)))
+                .thenReturn(new QuizzDraft(List.of(new QuizzDraft.Question("q", "a", List.of("b"), "e"))));
 
         assertThatThrownBy(() -> generator.generate(userId, fileId, 10, 4, Difficulty.MEDIO))
                 .hasMessageContaining("no valid questions");
@@ -51,12 +53,29 @@ class QuizzGeneratorTest {
     }
 
     @Test
-    void onlyValidDropsBadQuestions() {
-        var good = new GeneratedQuestion("q", List.of("a", "b", "c"), 2, "e");
-        var badIndex = new GeneratedQuestion("q", List.of("a", "b", "c"), 3, "e");
-        var badSize = new GeneratedQuestion("q", List.of("a", "b"), 0, "e");
+    void toValidDropsQuestionsWithTheWrongNumberOfOrRepeatedOptions() {
+        var good = new QuizzDraft.Question("q", "a", List.of("b", "c"), "e");
+        var tooFew = new QuizzDraft.Question("q", "a", List.of("b"), "e");
+        var repeated = new QuizzDraft.Question("q", "a", List.of("b", "b"), "e");
+        var sameAsCorrect = new QuizzDraft.Question("q", "a", List.of(" A ", "c"), "e");
 
-        assertThat(QuizzGenerator.onlyValid(List.of(good, badIndex, badSize), 3)).containsExactly(good);
+        var valid = QuizzGenerator.toValid(List.of(good, tooFew, repeated, sameAsCorrect), 3, new Random(1));
+
+        assertThat(valid).extracting(GeneratedQuestion::question).hasSize(1);
+        assertThat(valid.getFirst().options()).containsExactlyInAnyOrder("a", "b", "c");
+    }
+
+    @Test
+    void toValidMarksTheCorrectAnswerAndSpreadsItsPosition() {
+        var drafts = IntStream.range(0, 400)
+                .mapToObj(i -> new QuizzDraft.Question("q" + i, "right" + i, List.of("w1", "w2", "w3"), "e"))
+                .toList();
+
+        var valid = QuizzGenerator.toValid(drafts, 4, new Random(7));
+
+        assertThat(valid).allSatisfy(q -> assertThat(q.options().get(q.correctIndex())).startsWith("right"));
+        assertThat(valid.stream().collect(Collectors.groupingBy(GeneratedQuestion::correctIndex, Collectors.counting())))
+                .hasSize(4).allSatisfy((_, count) -> assertThat(count).isBetween(70L, 130L));
     }
 
     @Test
