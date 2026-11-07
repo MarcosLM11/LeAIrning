@@ -5,133 +5,135 @@
   "chunks" : 188,
   "retrievalBaselineChunks" : 188,
   "contextNotCaptured" : 0,
-  "faithfulness (answered)" : 0.952,
-  "correctness" : 0.984,
-  "falseAbstention" : 0.016,
+  "faithfulness (answered)" : 0.937,
+  "correctness" : 0.968,
+  "falseAbstention" : 0.0,
   "abstention (unanswerable)" : 0.533,
+  "goldInContext (answerable)" : 0.857,
+  "emptyContext (unanswerable)" : 0.0,
   "perQuestion" : [ {
     "correctRuns" : 3,
-    "id" : "q001",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q002",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q003",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q004",
-    "runs" : 3
-  }, {
-    "correctRuns" : 2,
-    "id" : "q005",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q006",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q007",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q008",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q009",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q010",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q011",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q012",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q013",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q014",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q015",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q016",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q017",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q018",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q019",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q020",
-    "runs" : 3
-  }, {
-    "correctRuns" : 3,
-    "id" : "q021",
-    "runs" : 3
-  }, {
-    "id" : "q022",
     "runs" : 3,
-    "abstainedRuns" : 3
+    "id" : "q001"
   }, {
-    "id" : "q023",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 3
+    "id" : "q002"
   }, {
-    "id" : "q024",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 0
+    "id" : "q003"
   }, {
-    "id" : "q025",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 0
+    "id" : "q004"
   }, {
-    "id" : "q026",
+    "correctRuns" : 1,
     "runs" : 3,
-    "abstainedRuns" : 1
+    "id" : "q005"
   }, {
-    "id" : "q027",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 0
+    "id" : "q006"
   }, {
-    "id" : "q028",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 3
+    "id" : "q007"
   }, {
-    "id" : "q029",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 3
+    "id" : "q008"
   }, {
-    "id" : "q030",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 3
+    "id" : "q009"
   }, {
-    "id" : "q031",
+    "correctRuns" : 3,
     "runs" : 3,
-    "abstainedRuns" : 0
+    "id" : "q010"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q011"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q012"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q013"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q014"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q015"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q016"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q017"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q018"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q019"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q020"
+  }, {
+    "correctRuns" : 3,
+    "runs" : 3,
+    "id" : "q021"
+  }, {
+    "abstainedRuns" : 3,
+    "runs" : 3,
+    "id" : "q022"
+  }, {
+    "abstainedRuns" : 3,
+    "runs" : 3,
+    "id" : "q023"
+  }, {
+    "abstainedRuns" : 0,
+    "runs" : 3,
+    "id" : "q024"
+  }, {
+    "abstainedRuns" : 0,
+    "runs" : 3,
+    "id" : "q025"
+  }, {
+    "abstainedRuns" : 0,
+    "runs" : 3,
+    "id" : "q026"
+  }, {
+    "abstainedRuns" : 0,
+    "runs" : 3,
+    "id" : "q027"
+  }, {
+    "abstainedRuns" : 3,
+    "runs" : 3,
+    "id" : "q028"
+  }, {
+    "abstainedRuns" : 3,
+    "runs" : 3,
+    "id" : "q029"
+  }, {
+    "abstainedRuns" : 3,
+    "runs" : 3,
+    "id" : "q030"
+  }, {
+    "abstainedRuns" : 1,
+    "runs" : 3,
+    "id" : "q031"
   } ]
 }
