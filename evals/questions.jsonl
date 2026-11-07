@@ -23,3 +23,9 @@
 {"id": "q023", "type": "unanswerable", "question": "How does the permessage-deflate extension negotiate its compression window size?", "doc": null, "gold_passages": null, "answer": null}
 {"id": "q024", "type": "unanswerable", "question": "Which JSON Schema keyword limits the maximum length of a string?", "doc": null, "gold_passages": null, "answer": null}
 {"id": "q025", "type": "unanswerable", "question": "How do I configure a WebSocket endpoint in Spring Boot?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q026", "type": "unanswerable", "question": "How do I deploy a WebSocket server behind a Kubernetes ingress?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q027", "type": "unanswerable", "question": "How does gRPC frame its messages compared with WebSocket?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q028", "type": "unanswerable", "question": "How does HTTP/2 multiplex streams over a single connection?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q029", "type": "unanswerable", "question": "How should a refresh token be rotated after it is used?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q030", "type": "unanswerable", "question": "Which Docker base image is recommended for a service that validates JWTs?", "doc": null, "gold_passages": null, "answer": null}
+{"id": "q031", "type": "unanswerable", "question": "How do I add comments to a JSON file?", "doc": null, "gold_passages": null, "answer": null}
