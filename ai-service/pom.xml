@@ -20,6 +20,9 @@
         <spring-ai.version>2.1.0-M1</spring-ai.version>
         <spring-ai-agent-utils.version>0.13.0</spring-ai-agent-utils.version>
         <spring-ai-session.version>0.10.0</spring-ai-session.version>
+        <!-- eval tests call OpenAI: skipped unless -Peval -->
+        <test.groups></test.groups>
+        <test.excluded>eval</test.excluded>
         <lz4.version>1.11.4</lz4.version>
         <snappy.version>1.1.10.9</snappy.version>
         <jsoup.version>1.23.2</jsoup.version>
@@ -140,6 +143,11 @@
             <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pdf-document-reader</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -185,6 +193,14 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <groups>${test.groups}</groups>
+                    <excludedGroups>${test.excluded}</excludedGroups>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
                     <execution>
@@ -221,6 +237,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>eval</id>
+            <properties>
+                <test.groups>eval</test.groups>
+                <test.excluded>none</test.excluded>
+            </properties>
+        </profile>
+    </profiles>
 
     <repositories>
         <repository>

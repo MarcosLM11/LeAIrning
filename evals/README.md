@@ -10,3 +10,14 @@ Reference dataset to measure retrieval and answer quality.
   - `answer`: reference answer, for the generation metrics.
 
 Each gold passage was checked against the text PDFBox extracts, the same reader the ingestion uses, and each appears exactly once in its document.
+
+## Running
+
+Both evals need `OPENAI_API_KEY`, Docker and JDK 27, and are skipped by a plain `mvn test`:
+
+```bash
+cd ingestion-service && OPENAI_API_KEY=... ./mvnw test -Peval   # evals/results/retrieval.json
+cd ai-service && OPENAI_API_KEY=... ./mvnw test -Peval          # evals/results/generation.json
+```
+
+`generation.json` has faithfulness (claims supported by the retrieved chunks, over answers that did not abstain), correctness against `answer`, false abstention on answerable questions, and abstention on unanswerable ones. Each question runs 3 times and an LLM judge grades it. `generation-details.json` keeps every answer and verdict so the judge can be spot-checked by hand.
